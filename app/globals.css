@@ -45,7 +45,6 @@ body {
 
 h1, h2, h3, h4, .font-serif-title {
   font-family: var(--font-dm-serif), Georgia, serif;
-  color: var(--text-primary);
 }
 
 /* Custom Scrollbar */

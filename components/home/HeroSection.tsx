@@ -41,8 +41,8 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
           }}
         />
         {/* Multilayered Brand Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#351202]/95 via-[#351202]/80 to-[#351202]/60 dark:from-black/95 dark:via-black/85 dark:to-black/70" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FEFAEE] dark:from-[#120904] via-transparent to-transparent opacity-95 transition-colors" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#351202]/95 via-[#351202]/85 to-[#351202]/70 dark:from-black/95 dark:via-black/90 dark:to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FEFAEE]/40 dark:from-[#120904]/40 via-transparent to-transparent opacity-95 transition-colors" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto w-full flex flex-col items-center text-center">
@@ -51,28 +51,28 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FEFAEE]/15 backdrop-blur-md border border-[#DB9309]/50 text-white text-xs sm:text-sm font-medium mb-6 shadow-sm"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#DB9309] text-[#FEFAEE] text-xs sm:text-sm font-semibold mb-6 shadow-lg"
         >
           <Sparkles className="w-4 h-4 text-[#DB9309]" />
           <span>India’s Most Trusted Desk-to-Destination Travel Architect</span>
         </motion.div>
 
-        {/* Main Catchy Headline */}
+        {/* Main Catchy Headline (Always high-contrast solid white in both light & dark mode) */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.1] max-w-4xl drop-shadow-md"
+          className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold !text-white tracking-tight leading-[1.1] max-w-4xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)]"
         >
-          From <span className="text-[#DB9309] italic underline decoration-[#DB9309]/50 decoration-wavy underline-offset-8">Desk</span> to Dream Destination
+          From <span className="text-[#DB9309] italic underline decoration-[#DB9309]/80 decoration-wavy underline-offset-8">Desk</span> to Dream Destination
         </motion.h1>
 
-        {/* Subtitle */}
+        {/* Subtitle (Solid readable white) */}
         <motion.p
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="mt-6 text-sm sm:text-lg text-white/90 max-w-2xl leading-relaxed font-light"
+          className="mt-6 text-sm sm:text-lg !text-white/95 max-w-2xl leading-relaxed font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
         >
           Handcrafted pan-India journeys designed for souls who crave unforgettable landscapes, royal stays, and zero-stress exploration.
         </motion.p>
@@ -155,7 +155,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/90 text-xs sm:text-sm font-medium"
+          className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/95 text-xs sm:text-sm font-medium drop-shadow"
         >
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-[#DB9309]" />
