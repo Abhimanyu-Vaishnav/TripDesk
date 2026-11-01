@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Calendar, Compass, ArrowRight, ShieldCheck, Sparkles, SlidersHorizontal } from 'lucide-react';
-import { STATES_LIST, THEMES_LIST } from '@/lib/mockData';
+import { Search, MapPin, Calendar, Compass, Sparkles, ShieldCheck } from 'lucide-react';
+import { STATES_LIST } from '@/lib/mockData';
 
 interface HeroSectionProps {
   onSearch: (filters: { state: string; destination: string; budget: string; duration: string }) => void;
@@ -41,8 +41,8 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
           }}
         />
         {/* Multilayered Brand Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#351202]/95 via-[#351202]/80 to-[#351202]/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FEFAEE] via-transparent to-transparent opacity-95" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#351202]/95 via-[#351202]/80 to-[#351202]/60 dark:from-black/95 dark:via-black/85 dark:to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FEFAEE] dark:from-[#120904] via-transparent to-transparent opacity-95 transition-colors" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto w-full flex flex-col items-center text-center">
@@ -50,7 +50,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
         <motion.div
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FEFAEE]/15 backdrop-blur-md border border-[#DB9309]/50 text-white text-xs sm:text-sm font-medium mb-6 shadow-sm"
         >
           <Sparkles className="w-4 h-4 text-[#DB9309]" />
@@ -59,9 +59,9 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
 
         {/* Main Catchy Headline */}
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
           className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.1] max-w-4xl drop-shadow-md"
         >
           From <span className="text-[#DB9309] italic underline decoration-[#DB9309]/50 decoration-wavy underline-offset-8">Desk</span> to Dream Destination
@@ -69,9 +69,9 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
 
         {/* Subtitle */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
           className="mt-6 text-sm sm:text-lg text-white/90 max-w-2xl leading-relaxed font-light"
         >
           Handcrafted pan-India journeys designed for souls who crave unforgettable landscapes, royal stays, and zero-stress exploration.
@@ -79,27 +79,27 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
 
         {/* Interactive Filter / Search Bar */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
           className="mt-10 w-full max-w-4xl"
         >
           <form
             onSubmit={handleSearchSubmit}
-            className="bg-[#FEFAEE] p-4 sm:p-5 rounded-3xl shadow-2xl border-2 border-[#DB9309] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left"
+            className="bg-[#FEFAEE] dark:bg-[#1D1008] p-4 sm:p-5 rounded-3xl shadow-2xl border-2 border-[#DB9309] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left transition-colors"
           >
             {/* 1. State / Region */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-white border border-[#EADBBA] hover:border-[#DB9309] transition-all">
-              <label className="block text-[11px] font-bold text-[#351202]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="p-2 sm:p-3 rounded-2xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+              <label className="block text-[11px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-[#DB9309]" /> State / Region
               </label>
               <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="w-full text-xs sm:text-sm font-semibold text-[#351202] bg-transparent focus:outline-none cursor-pointer"
+                className="w-full text-xs sm:text-sm font-semibold text-[#351202] dark:text-[#FEFAEE] bg-transparent focus:outline-none cursor-pointer"
               >
                 {STATES_LIST.map((st) => (
-                  <option key={st} value={st}>
+                  <option key={st} value={st} className="bg-white dark:bg-[#1D1008] text-[#351202] dark:text-[#FEFAEE]">
                     {st}
                   </option>
                 ))}
@@ -107,8 +107,8 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
             </div>
 
             {/* 2. Destination Search Keyword */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-white border border-[#EADBBA] hover:border-[#DB9309] transition-all">
-              <label className="block text-[11px] font-bold text-[#351202]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="p-2 sm:p-3 rounded-2xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+              <label className="block text-[11px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
                 <Compass className="w-3.5 h-3.5 text-[#DB9309]" /> Destination / City
               </label>
               <input
@@ -116,24 +116,24 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                 placeholder="e.g. Manali, Gulmarg, Alleppey"
                 value={searchDestination}
                 onChange={(e) => setSearchDestination(e.target.value)}
-                className="w-full text-xs sm:text-sm font-medium text-[#351202] bg-transparent focus:outline-none placeholder:text-[#351202]/40"
+                className="w-full text-xs sm:text-sm font-medium text-[#351202] dark:text-[#FEFAEE] bg-transparent focus:outline-none placeholder:text-[#351202]/40 dark:placeholder:text-[#FEFAEE]/40"
               />
             </div>
 
             {/* 3. Duration */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-white border border-[#EADBBA] hover:border-[#DB9309] transition-all">
-              <label className="block text-[11px] font-bold text-[#351202]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="p-2 sm:p-3 rounded-2xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+              <label className="block text-[11px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-[#DB9309]" /> Trip Duration
               </label>
               <select
                 value={selectedDuration}
                 onChange={(e) => setSelectedDuration(e.target.value)}
-                className="w-full text-xs sm:text-sm font-semibold text-[#351202] bg-transparent focus:outline-none cursor-pointer"
+                className="w-full text-xs sm:text-sm font-semibold text-[#351202] dark:text-[#FEFAEE] bg-transparent focus:outline-none cursor-pointer"
               >
-                <option value="all">Any Duration</option>
-                <option value="short">3 - 4 Days (Weekend getaway)</option>
-                <option value="medium">5 - 7 Days (Standard tour)</option>
-                <option value="long">8+ Days (Extended voyage)</option>
+                <option value="all" className="bg-white dark:bg-[#1D1008] text-[#351202] dark:text-[#FEFAEE]">Any Duration</option>
+                <option value="short" className="bg-white dark:bg-[#1D1008] text-[#351202] dark:text-[#FEFAEE]">3 - 4 Days (Weekend)</option>
+                <option value="medium" className="bg-white dark:bg-[#1D1008] text-[#351202] dark:text-[#FEFAEE]">5 - 7 Days (Standard)</option>
+                <option value="long" className="bg-white dark:bg-[#1D1008] text-[#351202] dark:text-[#FEFAEE]">8+ Days (Extended)</option>
               </select>
             </div>
 
@@ -141,9 +141,9 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
             <div className="flex items-center">
               <button
                 type="submit"
-                className="w-full h-full min-h-[52px] rounded-2xl bg-[#351202] hover:bg-[#4D1D05] active:scale-95 text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2 group border border-[#DB9309]/50"
+                className="w-full h-full min-h-[52px] rounded-2xl bg-[#351202] dark:bg-[#DB9309] hover:bg-[#4D1D05] dark:hover:bg-[#b87802] active:scale-95 text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2 group border border-[#DB9309]/50"
               >
-                <Search className="w-4 h-4 text-[#DB9309] group-hover:scale-110 transition-transform" />
+                <Search className="w-4 h-4 text-[#DB9309] dark:text-white group-hover:scale-110 transition-transform" />
                 <span>Search Journeys</span>
               </button>
             </div>
@@ -154,7 +154,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
           className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/90 text-xs sm:text-sm font-medium"
         >
           <div className="flex items-center gap-2">
@@ -174,4 +174,3 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
     </section>
   );
 }
-

@@ -78,10 +78,10 @@ export default function ExploreStatesSection({ onSelectState, selectedState }: E
           <span className="text-xs uppercase tracking-widest text-[#DB9309] font-bold">
             Pan-India Curations
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#351202] mt-1.5">
+          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#351202] dark:text-[#FEFAEE] mt-1.5">
             Explore by States & Regions
           </h2>
-          <p className="text-sm text-[#351202]/70 mt-2 max-w-xl">
+          <p className="text-sm text-[#351202]/70 dark:text-[#FEFAEE]/70 mt-2 max-w-xl">
             From the snow-crowned Himalayas of Kashmir to the tropical backwaters of Kerala, pick your dream state for tailor-made itineraries.
           </p>
         </div>
@@ -104,10 +104,10 @@ export default function ExploreStatesSection({ onSelectState, selectedState }: E
           return (
             <motion.div
               key={dest.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.05 }}
+              transition={{ duration: 0.3, delay: idx * 0.03 }}
               onClick={() => {
                 onSelectState(dest.state);
                 const el = document.getElementById('packages');
@@ -119,19 +119,16 @@ export default function ExploreStatesSection({ onSelectState, selectedState }: E
                   : 'border-transparent hover:border-[#DB9309]/50'
               }`}
             >
-              {/* Background Image */}
               <Image
                 src={dest.image}
                 alt={dest.name}
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"
-                className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
 
-              {/* Dark Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#351202] via-[#351202]/30 to-black/20 group-hover:from-[#351202]/95 transition-colors" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#351202] dark:from-black via-[#351202]/30 dark:via-black/40 to-black/20 group-hover:from-[#351202]/95 transition-colors" />
 
-              {/* Content */}
               <div className="absolute inset-0 p-4 sm:p-5 flex flex-col justify-between text-white">
                 <div className="flex justify-between items-start">
                   <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md">
@@ -162,4 +159,3 @@ export default function ExploreStatesSection({ onSelectState, selectedState }: E
     </section>
   );
 }
-

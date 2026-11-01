@@ -16,25 +16,45 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+
+  const applyTheme = (targetTheme: Theme) => {
+    const root = document.documentElement;
+    if (targetTheme === 'dark') {
+      root.classList.add('dark');
+      root.style.colorScheme = 'dark';
+    } else {
+      root.classList.remove('dark');
+      root.style.colorScheme = 'light';
+    }
+  };
 
   useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem('tripdesk_theme') as Theme | null;
-    if (stored) {
-      setTheme(stored);
-      document.documentElement.classList.toggle('dark', stored === 'dark');
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
+    try {
+      const stored = localStorage.getItem('tripdesk_theme') as Theme | null;
+      if (stored === 'dark' || stored === 'light') {
+        setTheme(stored);
+        applyTheme(stored);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+        applyTheme('dark');
+      } else {
+        setTheme('light');
+        applyTheme('light');
+      }
+    } catch (e) {
+      console.error(e);
     }
   }, []);
 
   const toggleTheme = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    localStorage.setItem('tripdesk_theme', next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    const nextTheme: Theme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    try {
+      localStorage.setItem('tripdesk_theme', nextTheme);
+    } catch (e) {
+      console.error(e);
+    }
+    applyTheme(nextTheme);
   };
 
   return (
@@ -47,4 +67,3 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   return useContext(ThemeContext);
 }
-

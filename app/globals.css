@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand-chocolate: #351202;
   --color-brand-gold: #DB9309;
@@ -17,13 +19,20 @@
   --border-brand: #EADBBA;
 }
 
-.dark {
+html.dark {
   --bg-primary: #120904;
   --bg-card: #1D1008;
   --bg-surface: #26160D;
   --text-primary: #FEFAEE;
   --text-muted: #EADBBA;
   --border-brand: #4D2612;
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
@@ -31,7 +40,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, .font-serif-title {
