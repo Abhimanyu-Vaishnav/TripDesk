@@ -41,6 +41,38 @@ export async function GET() {
           groupSize: item.group_size || 'Customizable',
           bestTimeToVisit: item.best_time_to_visit || 'Year-round'
         }));
+      } else if (!error && data && data.length === 0) {
+        // First-time seed: populate Supabase with verified mock packages automatically
+        for (const pkg of INITIAL_PACKAGES) {
+          await supabase.from('packages').upsert({
+            id: pkg.id,
+            slug: pkg.slug,
+            title: pkg.title,
+            tagline: pkg.tagline || '',
+            state: pkg.state,
+            location: pkg.location,
+            duration: pkg.duration,
+            price: pkg.price,
+            original_price: pkg.originalPrice,
+            hide_price: pkg.hidePrice || false,
+            featured: pkg.featured || false,
+            status: pkg.status || 'active',
+            rating: pkg.rating,
+            reviews_count: pkg.reviewsCount,
+            banner_image: pkg.bannerImage,
+            gallery: pkg.gallery,
+            video_url: pkg.videoUrl || '',
+            overview: pkg.overview || '',
+            theme: pkg.theme,
+            highlights: pkg.highlights,
+            inclusions: pkg.inclusions,
+            exclusions: pkg.exclusions,
+            itinerary: pkg.itinerary,
+            group_size: pkg.groupSize,
+            best_time_to_visit: pkg.bestTimeToVisit,
+            updated_at: new Date().toISOString()
+          });
+        }
       }
     } catch (e) {
       console.warn('Supabase packages fetch in API error:', e);
