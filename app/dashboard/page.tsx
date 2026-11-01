@@ -944,9 +944,11 @@ export default function OwnerDashboardPage() {
                         <td className="py-4 px-4">
                           <select
                             value={lead.status}
-                            onChange={(e) => {
-                              updateLeadStatus(lead.id, e.target.value as any);
-                              loadDashboardData();
+                            onChange={async (e) => {
+                              const newStatus = e.target.value as any;
+                              // Optimistically update UI
+                              setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: newStatus } : l));
+                              await updateLeadStatus(lead.id, newStatus);
                             }}
                             className="text-xs font-semibold px-2 py-1 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-[#351202] dark:text-[#FEFAEE]"
                           >

@@ -94,3 +94,51 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json({ success: false, message: 'id and status required' }, { status: 400 });
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase
+        .from('leads')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase update lead status error:', error);
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      }
+    }
+
+    return NextResponse.json({ success: true, id, status });
+  } catch (error) {
+    console.error('Error updating lead status:', error);
+    return NextResponse.json({ success: false, message: 'Failed to update lead status' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: 'Missing lead ID' }, { status: 400 });
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      await supabase.from('leads').delete().eq('id', id);
+    }
+
+    return NextResponse.json({ success: true, message: 'Lead deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting lead:', error);
+    return NextResponse.json({ success: false, message: 'Failed to delete lead' }, { status: 500 });
+  }
+}

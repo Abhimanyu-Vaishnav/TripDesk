@@ -311,7 +311,7 @@ export async function saveLead(leadData: Omit<LeadInquiry, 'id' | 'createdAt' | 
   return newLead;
 }
 
-export function updateLeadStatus(id: string, status: LeadInquiry['status']) {
+export async function updateLeadStatus(id: string, status: LeadInquiry['status']) {
   const leads = getStoredLeads();
   const lead = leads.find(l => l.id === id);
   if (lead) {
@@ -323,5 +323,16 @@ export function updateLeadStatus(id: string, status: LeadInquiry['status']) {
         console.error(e);
       }
     }
+  }
+
+  // Update in cloud Supabase database
+  try {
+    await fetch('/api/leads', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status })
+    });
+  } catch (err) {
+    console.error('Failed to sync lead status to cloud:', err);
   }
 }
