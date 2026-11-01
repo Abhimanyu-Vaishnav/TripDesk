@@ -5,13 +5,16 @@ import Link from 'next/link';
 import { Mail, Phone, MapPin, Heart, Globe, MessageCircle, Send } from 'lucide-react';
 import Logo from './Logo';
 import { SiteSettings } from '@/types';
-import { getStoredSettings, DEFAULT_SETTINGS } from '@/lib/storage';
+import { getStoredSettings, DEFAULT_SETTINGS, fetchCloudSettings } from '@/lib/storage';
 
 export default function Footer() {
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
     setSettings(getStoredSettings());
+    fetchCloudSettings().then(cloudSettings => {
+      if (cloudSettings) setSettings(cloudSettings);
+    });
   }, []);
 
   return (

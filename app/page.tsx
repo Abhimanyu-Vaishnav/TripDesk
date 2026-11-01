@@ -11,7 +11,7 @@ import PackageCard from '@/components/packages/PackageCard';
 import PackageDetailModal from '@/components/packages/PackageDetailModal';
 import InquiryForm from '@/components/contact/InquiryForm';
 import { TourPackage, SiteSettings } from '@/types';
-import { getStoredPackages, getStoredSettings } from '@/lib/storage';
+import { getStoredPackages, getStoredSettings, fetchCloudPackages, fetchCloudSettings } from '@/lib/storage';
 import { THEMES_LIST, STATES_LIST } from '@/lib/mockData';
 import { Sparkles, Search } from 'lucide-react';
 
@@ -30,8 +30,22 @@ export default function HomePage() {
   const [enquiryPackage, setEnquiryPackage] = useState<TourPackage | null>(null);
 
   useEffect(() => {
+    // Immediate render with local cache
     setPackages(getStoredPackages());
     setSettings(getStoredSettings());
+
+    // Asynchronously sync from Cloud database
+    fetchCloudPackages().then(cloudPkgs => {
+      if (cloudPkgs && cloudPkgs.length > 0) {
+        setPackages(cloudPkgs);
+      }
+    });
+
+    fetchCloudSettings().then(cloudSettings => {
+      if (cloudSettings) {
+        setSettings(cloudSettings);
+      }
+    });
   }, []);
 
   const handleHeroSearch = (filters: { state: string; destination: string; budget: string; duration: string }) => {

@@ -25,7 +25,7 @@ import Footer from '@/components/ui/Footer';
 import FloatingCTA from '@/components/ui/FloatingCTA';
 import InquiryForm from '@/components/contact/InquiryForm';
 import { TourPackage, SiteSettings } from '@/types';
-import { getPackageByIdOrSlug, getStoredSettings } from '@/lib/storage';
+import { getPackageByIdOrSlug, getStoredSettings, fetchCloudPackages, fetchCloudSettings } from '@/lib/storage';
 
 export default function PackageDetailPage() {
   const params = useParams();
@@ -43,8 +43,17 @@ export default function PackageDetailPage() {
       if (found) {
         setPackageData(found);
       }
+      fetchCloudPackages().then(pkgs => {
+        const cloudFound = pkgs.find(p => p.id === slug || p.slug === slug);
+        if (cloudFound) {
+          setPackageData(cloudFound);
+        }
+      });
     }
     setSettings(getStoredSettings());
+    fetchCloudSettings().then(s => {
+      if (s) setSettings(s);
+    });
   }, [slug]);
 
   const handleShare = () => {

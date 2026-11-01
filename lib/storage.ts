@@ -28,32 +28,16 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 
 let memorySettings: SiteSettings = { ...DEFAULT_SETTINGS };
 let memoryPackages: TourPackage[] = [...INITIAL_PACKAGES];
-let memoryLeads: LeadInquiry[] = [
-  {
-    id: 'lead-01',
-    type: 'package_booking',
-    name: 'Aarav Sharma',
-    email: 'aarav.sharma@example.com',
-    phone: '+91 98765 43210',
-    destination: 'Kashmir',
-    travelDate: '2026-11-20',
-    travelersCount: 2,
-    budgetRange: '₹50,000 - ₹75,000',
-    notes: 'Planning our 2nd wedding anniversary trip. Interested in luxury houseboat stay.',
-    packageId: 'td-01',
-    packageTitle: 'Kashmir: Paradise On Earth & Dal Lake Escapade',
-    createdAt: '2026-10-28T10:30:00.000Z',
-    status: 'contacted'
-  }
-];
+let memoryLeads: LeadInquiry[] = [];
 
+// ==========================================
 // SITE SETTINGS
+// ==========================================
 export function getStoredSettings(): SiteSettings {
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
       if (stored) return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
-      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS));
     } catch {
       return memorySettings;
     }
@@ -62,6 +46,26 @@ export function getStoredSettings(): SiteSettings {
 }
 
 export async function fetchCloudSettings(): Promise<SiteSettings> {
+  // 1. Try Next.js API route first (which has server-side Supabase credentials)
+  try {
+    const res = await fetch('/api/settings', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.settings) {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(json.settings));
+          } catch {}
+        }
+        memorySettings = json.settings;
+        return json.settings;
+      }
+    }
+  } catch (err) {
+    console.warn('API fetch settings error, trying client Supabase:', err);
+  }
+
+  // 2. Direct client supabase fallback
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase
@@ -73,7 +77,7 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
       if (!error && data) {
         const cloudSettings: SiteSettings = {
           hideAllPrices: Boolean(data.hide_all_prices),
-          contactMode: data.contact_mode || 'google_form',
+          contactMode: data.contact_mode || DEFAULT_SETTINGS.contactMode,
           googleFormEmbedUrl: data.google_form_embed_url || DEFAULT_SETTINGS.googleFormEmbedUrl,
           companyName: data.company_name || DEFAULT_SETTINGS.companyName,
           tagline: data.tagline || DEFAULT_SETTINGS.tagline,
@@ -110,36 +114,21 @@ export async function saveStoredSettings(settings: SiteSettings) {
     }
   }
 
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('site_settings').upsert({
-        id: 'primary_settings',
-        hide_all_prices: settings.hideAllPrices,
-        contact_mode: settings.contactMode,
-        google_form_embed_url: settings.googleFormEmbedUrl,
-        company_name: settings.companyName,
-        tagline: settings.tagline,
-        about_text: settings.aboutText,
-        contact_address: settings.contactAddress,
-        contact_email: settings.contactEmail,
-        contact_phone: settings.contactPhone,
-        contact_landline: settings.contactLandline,
-        whatsapp_number: settings.whatsappNumber,
-        instagram_url: settings.instagramUrl,
-        facebook_url: settings.facebookUrl,
-        twitter_url: settings.twitterUrl,
-        youtube_url: settings.youtubeUrl,
-        response_timing_text: settings.responseTimingText,
-        copyright_text: settings.copyrightText,
-        updated_at: new Date().toISOString()
-      });
-    } catch (e) {
-      console.error('Supabase settings save failed:', e);
-    }
+  // Save via API (persists to server & Supabase regardless of client env)
+  try {
+    await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings)
+    });
+  } catch (err) {
+    console.error('Settings API save failed:', err);
   }
 }
 
+// ==========================================
 // PACKAGES
+// ==========================================
 export function getStoredPackages(): TourPackage[] {
   if (typeof window !== 'undefined') {
     try {
@@ -154,44 +143,19 @@ export function getStoredPackages(): TourPackage[] {
 }
 
 export async function fetchCloudPackages(): Promise<TourPackage[]> {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase.from('packages').select('*').order('created_at', { ascending: false });
-      if (!error && data && data.length > 0) {
-        const mapped: TourPackage[] = data.map((item) => ({
-          id: item.id,
-          slug: item.slug,
-          title: item.title,
-          tagline: item.tagline || '',
-          state: item.state,
-          location: item.location,
-          duration: item.duration || { days: 5, nights: 4 },
-          price: Number(item.price),
-          originalPrice: item.original_price ? Number(item.original_price) : undefined,
-          hidePrice: Boolean(item.hide_price),
-          featured: Boolean(item.featured),
-          status: item.status || 'active',
-          rating: Number(item.rating) || 4.9,
-          reviewsCount: Number(item.reviews_count) || 1,
-          bannerImage: item.banner_image,
-          gallery: Array.isArray(item.gallery) ? item.gallery : [item.banner_image],
-          videoUrl: item.video_url || '',
-          overview: item.overview || '',
-          theme: item.theme || 'Nature',
-          highlights: Array.isArray(item.highlights) ? item.highlights : [],
-          inclusions: Array.isArray(item.inclusions) ? item.inclusions : [],
-          exclusions: Array.isArray(item.exclusions) ? item.exclusions : [],
-          itinerary: Array.isArray(item.itinerary) ? item.itinerary : [],
-          groupSize: item.group_size || 'Customizable',
-          bestTimeToVisit: item.best_time_to_visit || 'Year-round'
-        }));
-        saveStoredPackages(mapped);
-        return mapped;
+  try {
+    const res = await fetch('/api/packages', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.packages && json.packages.length > 0) {
+        saveStoredPackages(json.packages);
+        return json.packages;
       }
-    } catch (e) {
-      console.warn('Supabase packages fetch fallback:', e);
     }
+  } catch (err) {
+    console.warn('API fetch packages error:', err);
   }
+
   return getStoredPackages();
 }
 
@@ -250,71 +214,44 @@ export async function savePackage(pkg: Partial<TourPackage> & { title: string })
   } else {
     packages.unshift(fullPkg);
   }
-  
+
   saveStoredPackages(packages);
 
-  // Sync to Supabase cloud
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('packages').upsert({
-        id: fullPkg.id,
-        slug: fullPkg.slug,
-        title: fullPkg.title,
-        tagline: fullPkg.tagline,
-        state: fullPkg.state,
-        location: fullPkg.location,
-        duration: fullPkg.duration,
-        price: fullPkg.price,
-        original_price: fullPkg.originalPrice,
-        hide_price: fullPkg.hidePrice,
-        featured: fullPkg.featured,
-        status: fullPkg.status,
-        rating: fullPkg.rating,
-        reviews_count: fullPkg.reviewsCount,
-        banner_image: fullPkg.bannerImage,
-        gallery: fullPkg.gallery,
-        video_url: fullPkg.videoUrl,
-        overview: fullPkg.overview,
-        theme: fullPkg.theme,
-        highlights: fullPkg.highlights,
-        inclusions: fullPkg.inclusions,
-        exclusions: fullPkg.exclusions,
-        itinerary: fullPkg.itinerary,
-        group_size: fullPkg.groupSize,
-        best_time_to_visit: fullPkg.bestTimeToVisit,
-        updated_at: new Date().toISOString()
-      });
-    } catch (e) {
-      console.error('Supabase package save error:', e);
-    }
+  // Sync to API / Cloud
+  try {
+    await fetch('/api/packages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fullPkg)
+    });
+  } catch (e) {
+    console.error('API package save failed:', e);
   }
 
   return fullPkg;
 }
 
-export async function deletePackage(id: string): Promise<boolean> {
-  const packages = getStoredPackages();
-  const filtered = packages.filter(p => p.id !== id);
-  saveStoredPackages(filtered);
+export async function deletePackage(id: string) {
+  const packages = getStoredPackages().filter(p => p.id !== id);
+  saveStoredPackages(packages);
 
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('packages').delete().eq('id', id);
-    } catch (e) {
-      console.error('Supabase package delete error:', e);
-    }
+  try {
+    await fetch(`/api/packages?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+  } catch (e) {
+    console.error('API package delete failed:', e);
   }
-
-  return true;
 }
 
-// LEADS
+// ==========================================
+// LEADS & INQUIRIES
+// ==========================================
 export function getStoredLeads(): LeadInquiry[] {
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(LEADS_STORAGE_KEY);
       if (stored) return JSON.parse(stored);
-      localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(memoryLeads));
     } catch {
       return memoryLeads;
     }
@@ -323,46 +260,35 @@ export function getStoredLeads(): LeadInquiry[] {
 }
 
 export async function fetchCloudLeads(): Promise<LeadInquiry[]> {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
-      if (!error && data) {
-        const mapped: LeadInquiry[] = data.map((item) => ({
-          id: item.id,
-          type: item.type,
-          name: item.name,
-          email: item.email || '',
-          phone: item.phone,
-          destination: item.destination,
-          travelDate: item.travel_date,
-          travelersCount: item.travelers_count,
-          budgetRange: item.budget_range,
-          notes: item.notes,
-          packageId: item.package_id,
-          packageTitle: item.package_title,
-          createdAt: item.created_at,
-          status: item.status || 'new'
-        }));
+  try {
+    const res = await fetch('/api/leads', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.leads) {
         if (typeof window !== 'undefined') {
-          localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(mapped));
+          try {
+            localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(json.leads));
+          } catch {}
         }
-        return mapped;
+        memoryLeads = json.leads;
+        return json.leads;
       }
-    } catch (e) {
-      console.warn('Supabase leads fetch error:', e);
     }
+  } catch (err) {
+    console.warn('API leads fetch fallback:', err);
   }
   return getStoredLeads();
 }
 
-export async function saveLead(lead: Omit<LeadInquiry, 'id' | 'createdAt' | 'status'>): Promise<LeadInquiry> {
+export async function saveLead(leadData: Omit<LeadInquiry, 'id' | 'createdAt' | 'status'> & { status?: LeadInquiry['status'] }): Promise<LeadInquiry> {
   const leads = getStoredLeads();
   const newLead: LeadInquiry = {
-    ...lead,
-    id: `lead-${Date.now()}`,
+    ...leadData,
+    id: `lead-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
     createdAt: new Date().toISOString(),
-    status: 'new'
+    status: leadData.status || 'new'
   };
+
   leads.unshift(newLead);
   if (typeof window !== 'undefined') {
     try {
@@ -372,48 +298,30 @@ export async function saveLead(lead: Omit<LeadInquiry, 'id' | 'createdAt' | 'sta
     }
   }
 
-  // Push to Supabase Cloud
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('leads').insert({
-        id: newLead.id,
-        type: newLead.type || 'general_inquiry',
-        name: newLead.name,
-        phone: newLead.phone,
-        email: newLead.email || '',
-        destination: newLead.destination || '',
-        travel_date: newLead.travelDate || '',
-        travelers_count: newLead.travelersCount || 2,
-        budget_range: newLead.budgetRange || '',
-        notes: newLead.notes || '',
-        package_id: newLead.packageId,
-        package_title: newLead.packageTitle,
-        status: 'new',
-        created_at: newLead.createdAt
-      });
-    } catch (e) {
-      console.error('Supabase lead insert error:', e);
-    }
+  try {
+    await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newLead)
+    });
+  } catch (e) {
+    console.error('API lead dispatch failed:', e);
   }
 
   return newLead;
 }
 
-export async function updateLeadStatus(id: string, status: LeadInquiry['status']) {
+export function updateLeadStatus(id: string, status: LeadInquiry['status']) {
   const leads = getStoredLeads();
-  const item = leads.find(l => l.id === id);
-  if (item) {
-    item.status = status;
+  const lead = leads.find(l => l.id === id);
+  if (lead) {
+    lead.status = status;
     if (typeof window !== 'undefined') {
-      localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(leads));
-    }
-  }
-
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('leads').update({ status }).eq('id', id);
-    } catch (e) {
-      console.error('Supabase lead status update error:', e);
+      try {
+        localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(leads));
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 }

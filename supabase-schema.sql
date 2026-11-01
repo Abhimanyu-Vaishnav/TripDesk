@@ -88,3 +88,4 @@ CREATE POLICY "Allow public update on leads" ON leads FOR UPDATE USING (true);
 
 CREATE POLICY "Allow public read access on site_settings" ON site_settings FOR SELECT USING (true);
 CREATE POLICY "Allow public insert/update on site_settings" ON site_settings FOR ALL USING (true);
+

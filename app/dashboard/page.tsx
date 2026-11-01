@@ -44,7 +44,10 @@ import {
   updateLeadStatus,
   getStoredSettings,
   saveStoredSettings,
-  DEFAULT_SETTINGS
+  DEFAULT_SETTINGS,
+  fetchCloudPackages,
+  fetchCloudSettings,
+  fetchCloudLeads
 } from '@/lib/storage';
 import { STATES_LIST, THEMES_LIST } from '@/lib/mockData';
 
@@ -120,6 +123,17 @@ export default function OwnerDashboardPage() {
     setPackages(getStoredPackages());
     setLeads(getStoredLeads());
     setSettings(getStoredSettings());
+
+    // Sync latest from database
+    fetchCloudPackages().then(cloudPkgs => {
+      if (cloudPkgs && cloudPkgs.length > 0) setPackages(cloudPkgs);
+    });
+    fetchCloudLeads().then(cloudLeads => {
+      if (cloudLeads) setLeads(cloudLeads);
+    });
+    fetchCloudSettings().then(cloudSettings => {
+      if (cloudSettings) setSettings(cloudSettings);
+    });
   };
 
   const handleLogin = (e: React.FormEvent) => {
