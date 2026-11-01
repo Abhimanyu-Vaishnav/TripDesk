@@ -1,10 +1,20 @@
-import { TourPackage, LeadInquiry } from '@/types';
+import { TourPackage, LeadInquiry, SiteSettings } from '@/types';
 import { INITIAL_PACKAGES } from './mockData';
 
-const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v1';
-const LEADS_STORAGE_KEY = 'tripdesk_leads_v1';
+const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v2';
+const LEADS_STORAGE_KEY = 'tripdesk_leads_v2';
+const SETTINGS_STORAGE_KEY = 'tripdesk_settings_v2';
 
-// Server-side fallback / initial memory store
+export const DEFAULT_SETTINGS: SiteSettings = {
+  hideAllPrices: false,
+  contactMode: 'google_form',
+  googleFormEmbedUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScU73iF8gH-tripdesk-sample/viewform?embedded=true',
+  whatsappNumber: '+919876543210',
+  contactEmail: 'desk@tripdeskholidays.com',
+  contactPhone: '+91 98765 43210'
+};
+
+let memorySettings: SiteSettings = { ...DEFAULT_SETTINGS };
 let memoryPackages: TourPackage[] = [...INITIAL_PACKAGES];
 let memoryLeads: LeadInquiry[] = [
   {
@@ -21,24 +31,35 @@ let memoryLeads: LeadInquiry[] = [
     packageTitle: 'Kashmir: Paradise On Earth & Dal Lake Escapade',
     createdAt: '2026-10-28T10:30:00.000Z',
     status: 'contacted'
-  },
-  {
-    id: 'lead-02',
-    name: 'Pooja Iyer',
-    email: 'pooja.iyer@example.com',
-    phone: '+91 98112 23344',
-    destination: 'Kerala',
-    travelDate: '2026-12-15',
-    travelersCount: 4,
-    budgetRange: '₹1,00,000+',
-    notes: 'Family vacation with senior citizens, need comfortable vehicles and easy pace.',
-    packageId: 'td-04',
-    packageTitle: 'Kerala: Munnar Tea Hills, Alleppey Houseboat & Kochi',
-    createdAt: '2026-10-30T14:15:00.000Z',
-    status: 'new'
   }
 ];
 
+// SITE SETTINGS
+export function getStoredSettings(): SiteSettings {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (stored) return JSON.parse(stored);
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS));
+    } catch {
+      return memorySettings;
+    }
+  }
+  return memorySettings;
+}
+
+export function saveStoredSettings(settings: SiteSettings) {
+  memorySettings = settings;
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+
+// PACKAGES
 export function getStoredPackages(): TourPackage[] {
   if (typeof window !== 'undefined') {
     try {
@@ -85,6 +106,7 @@ export function savePackage(pkg: Partial<TourPackage> & { title: string }): Tour
     duration: pkg.duration || { days: 4, nights: 3 },
     price: Number(pkg.price) || 15000,
     originalPrice: pkg.originalPrice ? Number(pkg.originalPrice) : undefined,
+    hidePrice: Boolean(pkg.hidePrice),
     featured: Boolean(pkg.featured),
     status: pkg.status || 'active',
     rating: pkg.rating || 4.9,
@@ -129,14 +151,12 @@ export function deletePackage(id: string): boolean {
   return true;
 }
 
-// Leads
+// LEADS
 export function getStoredLeads(): LeadInquiry[] {
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(LEADS_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
+      if (stored) return JSON.parse(stored);
       localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(memoryLeads));
     } catch {
       return memoryLeads;
@@ -174,4 +194,3 @@ export function updateLeadStatus(id: string, status: LeadInquiry['status']) {
     }
   }
 }
-

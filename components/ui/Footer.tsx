@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { Mail, Phone, MapPin, ShieldCheck, Heart, Globe, MessageCircle, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Heart, Globe, MessageCircle, Send } from 'lucide-react';
 import Logo from './Logo';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#351202] text-[#FEFAEE] pt-16 pb-8 border-t-4 border-[#DB9309]">
+    <footer className="bg-[#351202] dark:bg-[#120904] text-[#FEFAEE] pt-16 pb-8 border-t-4 border-[#DB9309]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#FEFAEE]/10">
           
@@ -114,11 +114,6 @@ export default function Footer() {
                   Coastal Sun & Sand
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="text-[#DB9309]/80 hover:text-[#DB9309] flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Staff Dashboard
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -160,7 +155,7 @@ export default function Footer() {
           <div className="flex items-center gap-6">
             <Link href="/#contact" className="hover:text-[#FEFAEE]">Privacy Policy</Link>
             <Link href="/#contact" className="hover:text-[#FEFAEE]">Terms of Service</Link>
-            <Link href="/admin" className="hover:text-[#DB9309]">Admin Portal</Link>
+            <Link href="/dashboard" className="hover:text-[#DB9309] text-[11px] opacity-75">Staff Portal</Link>
           </div>
         </div>
       </div>

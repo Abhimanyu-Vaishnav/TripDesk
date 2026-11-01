@@ -10,13 +10,15 @@ import WhyUsSection from '@/components/home/WhyUsSection';
 import PackageCard from '@/components/packages/PackageCard';
 import PackageDetailModal from '@/components/packages/PackageDetailModal';
 import InquiryForm from '@/components/contact/InquiryForm';
-import { TourPackage } from '@/types';
-import { getStoredPackages } from '@/lib/storage';
+import { TourPackage, SiteSettings } from '@/types';
+import { getStoredPackages, getStoredSettings } from '@/lib/storage';
 import { THEMES_LIST, STATES_LIST } from '@/lib/mockData';
-import { Filter, SlidersHorizontal, Sparkles, MapPin, Search } from 'lucide-react';
+import { Sparkles, Search } from 'lucide-react';
 
 export default function HomePage() {
   const [packages, setPackages] = useState<TourPackage[]>([]);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+
   const [selectedState, setSelectedState] = useState<string>('All States');
   const [selectedTheme, setSelectedTheme] = useState<string>('All Themes');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -28,9 +30,8 @@ export default function HomePage() {
   const [enquiryPackage, setEnquiryPackage] = useState<TourPackage | null>(null);
 
   useEffect(() => {
-    // Load local storage / mock data
-    const loaded = getStoredPackages();
-    setPackages(loaded);
+    setPackages(getStoredPackages());
+    setSettings(getStoredSettings());
   }, []);
 
   const handleHeroSearch = (filters: { state: string; destination: string; budget: string; duration: string }) => {
@@ -50,17 +51,16 @@ export default function HomePage() {
 
   // Filter logic
   const filteredPackages = packages.filter((pkg) => {
-    // State
+    if (pkg.status === 'draft') return false;
+
     if (selectedState !== 'All States' && pkg.state.toLowerCase() !== selectedState.toLowerCase()) {
       return false;
     }
 
-    // Theme
     if (selectedTheme !== 'All Themes' && pkg.theme.toLowerCase() !== selectedTheme.toLowerCase()) {
       return false;
     }
 
-    // Search query (matches title, location, or state)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const match =
@@ -71,12 +71,10 @@ export default function HomePage() {
       if (!match) return false;
     }
 
-    // Duration
     if (selectedDuration === 'short' && pkg.duration.days > 4) return false;
     if (selectedDuration === 'medium' && (pkg.duration.days < 5 || pkg.duration.days > 7)) return false;
     if (selectedDuration === 'long' && pkg.duration.days < 8) return false;
 
-    // Budget
     if (selectedBudget === 'budget' && pkg.price > 20000) return false;
     if (selectedBudget === 'mid' && (pkg.price < 20000 || pkg.price > 30000)) return false;
     if (selectedBudget === 'luxury' && pkg.price <= 30000) return false;
@@ -85,7 +83,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FEFAEE]">
+    <div className="min-h-screen flex flex-col bg-[#FEFAEE] dark:bg-[#120904]">
       <Navbar />
 
       <main className="flex-1">
@@ -106,21 +104,20 @@ export default function HomePage() {
               <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#DB9309] font-bold">
                 <Sparkles className="w-3.5 h-3.5" /> Handcrafted Packages
               </div>
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#351202] mt-1.5">
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#351202] dark:text-[#FEFAEE] mt-1.5">
                 Trending Tour Packages
               </h2>
-              <p className="text-sm text-[#351202]/70 mt-2 max-w-xl">
+              <p className="text-sm text-[#351202]/70 dark:text-[#FEFAEE]/70 mt-2 max-w-xl">
                 All-inclusive experiential itineraries. Every package includes verified stays, AC private transfers, breakfasts & curated sightseeing.
               </p>
             </div>
 
             {/* Quick Filter Bar */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-[#FDF7E7] p-2 rounded-2xl border border-[#EADBBA]">
-              {/* Theme Dropdown */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-[#FDF7E7] dark:bg-[#1D1008] p-2 rounded-2xl border border-[#EADBBA] dark:border-[#4D2612]">
               <select
                 value={selectedTheme}
                 onChange={(e) => setSelectedTheme(e.target.value)}
-                className="text-xs font-semibold px-3 py-2 rounded-xl bg-white border border-[#EADBBA] text-[#351202] focus:outline-none focus:border-[#DB9309] cursor-pointer"
+                className="text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
               >
                 {THEMES_LIST.map((th) => (
                   <option key={th} value={th}>
@@ -129,11 +126,10 @@ export default function HomePage() {
                 ))}
               </select>
 
-              {/* State Dropdown */}
               <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="text-xs font-semibold px-3 py-2 rounded-xl bg-white border border-[#EADBBA] text-[#351202] focus:outline-none focus:border-[#DB9309] cursor-pointer"
+                className="text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
               >
                 {STATES_LIST.map((st) => (
                   <option key={st} value={st}>
@@ -158,10 +154,10 @@ export default function HomePage() {
           </div>
 
           {/* Results count & status */}
-          <div className="flex items-center justify-between text-xs text-[#351202]/60 mb-6 pb-3 border-b border-[#EADBBA]/60">
+          <div className="flex items-center justify-between text-xs text-[#351202]/60 dark:text-[#FEFAEE]/60 mb-6 pb-3 border-b border-[#EADBBA]/60 dark:border-[#4D2612]">
             <span>Showing {filteredPackages.length} packages across India</span>
             {selectedState !== 'All States' && (
-              <span className="font-medium text-[#351202]">Filtered by {selectedState}</span>
+              <span className="font-medium text-[#351202] dark:text-[#FEFAEE]">Filtered by {selectedState}</span>
             )}
           </div>
 
@@ -172,15 +168,16 @@ export default function HomePage() {
                 <PackageCard
                   key={pkg.id}
                   packageData={pkg}
+                  hideAllPrices={settings?.hideAllPrices}
                   onQuickView={(p) => setActiveModalPackage(p)}
                 />
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center bg-[#FDF7E7] rounded-3xl border border-[#EADBBA] p-8">
+            <div className="py-20 text-center bg-[#FDF7E7] dark:bg-[#1D1008] rounded-3xl border border-[#EADBBA] dark:border-[#4D2612] p-8">
               <Search className="w-12 h-12 text-[#DB9309] mx-auto mb-3" />
-              <h3 className="font-serif text-2xl font-bold text-[#351202]">No Packages Found</h3>
-              <p className="text-sm text-[#351202]/70 mt-2 max-w-md mx-auto">
+              <h3 className="font-serif text-2xl font-bold text-[#351202] dark:text-[#FEFAEE]">No Packages Found</h3>
+              <p className="text-sm text-[#351202]/70 dark:text-[#FEFAEE]/70 mt-2 max-w-md mx-auto">
                 No itineraries match your current search filters. Try switching states or resetting filters.
               </p>
               <button

@@ -2,17 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, CheckCircle2, ShieldCheck, Clock, User, Mail, Phone, MapPin, Users, Calendar, AlertCircle } from 'lucide-react';
+import { Send, CheckCircle2, ShieldCheck, Clock, User, Mail, Phone, MapPin, Users, Calendar, ExternalLink } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { TourPackage } from '@/types';
-import { saveLead } from '@/lib/storage';
+import { TourPackage, SiteSettings } from '@/types';
+import { saveLead, getStoredSettings } from '@/lib/storage';
 
 interface InquiryFormProps {
   initialPackage?: TourPackage | null;
-  googleFormEmbedUrl?: string; // Optional Google Form url if user provides
 }
 
 export default function InquiryForm({ initialPackage }: InquiryFormProps) {
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -23,7 +24,10 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState<'custom' | 'google-form'>('custom');
+
+  useEffect(() => {
+    setSettings(getStoredSettings());
+  }, []);
 
   useEffect(() => {
     if (initialPackage) {
@@ -37,7 +41,6 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
     setIsSubmitting(true);
 
     try {
-      // 1. Save lead to internal system / localStorage
       const savedLead = saveLead({
         name,
         email,
@@ -51,7 +54,6 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
         packageTitle: initialPackage?.title
       });
 
-      // 2. Also attempt to post to backend lead endpoint if available
       try {
         await fetch('/api/leads', {
           method: 'POST',
@@ -59,10 +61,9 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
           body: JSON.stringify(savedLead)
         });
       } catch {
-        // Fallback already saved locally
+        // Local fallback handled
       }
 
-      // 3. Trigger celebration confetti
       if (typeof window !== 'undefined') {
         confetti({
           particleCount: 80,
@@ -88,59 +89,55 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
     setIsSuccess(false);
   };
 
+  const isGoogleFormMode = settings?.contactMode === 'google_form';
+  const googleFormUrl = settings?.googleFormEmbedUrl || 'https://docs.google.com/forms/d/e/1FAIpQLScU73iF8gH-tripdesk-sample/viewform?embedded=true';
+
   return (
-    <div className="bg-[#FEFAEE] rounded-3xl border-2 border-[#DB9309] p-6 sm:p-10 shadow-xl relative overflow-hidden">
-      {/* Decorative top badge */}
-      <div className="flex items-center justify-between pb-6 border-b border-[#EADBBA]">
+    <div className="bg-[#FEFAEE] dark:bg-[#1D1008] rounded-3xl border-2 border-[#DB9309] p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-[#EADBBA] dark:border-[#4D2612] gap-4">
         <div>
           <span className="text-[11px] uppercase tracking-widest text-[#DB9309] font-bold">
-            Desk To Destination • Tailor-made Journeys
+            Desk To Destination • Direct Travel Inquiry
           </span>
-          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#351202] mt-1">
+          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#351202] dark:text-[#FEFAEE] mt-1">
             Plan Your Dream Getaway
           </h3>
-          <p className="text-xs sm:text-sm text-[#351202]/75 mt-1">
-            Fill your details below. Our holiday architect will craft a customized, zero-obligation quote within 2 hours.
+          <p className="text-xs sm:text-sm text-[#351202]/75 dark:text-[#FEFAEE]/75 mt-1">
+            Fill your details. Our holiday architect will craft a customized, zero-obligation quote within 2 hours.
           </p>
         </div>
 
-        {/* Tab switch for Custom vs Embedded Form */}
-        <div className="hidden sm:flex bg-[#FDF7E7] p-1 rounded-xl border border-[#EADBBA] text-xs">
-          <button
-            onClick={() => setActiveTab('custom')}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-              activeTab === 'custom' ? 'bg-[#351202] text-white shadow' : 'text-[#351202]/70 hover:text-[#351202]'
-            }`}
+        {isGoogleFormMode && (
+          <a
+            href={googleFormUrl.replace('?embedded=true', '')}
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-[#DB9309] hover:underline flex items-center gap-1 font-semibold"
           >
-            Direct Inquiry
-          </button>
-          <button
-            onClick={() => setActiveTab('google-form')}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-              activeTab === 'google-form' ? 'bg-[#351202] text-white shadow' : 'text-[#351202]/70 hover:text-[#351202]'
-            }`}
-          >
-            Google Form Mode
-          </button>
-        </div>
+            <span>Open in Full Screen</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
       </div>
 
-      {activeTab === 'google-form' ? (
+      {/* Render Google Form or Custom Form based on Dashboard Settings */}
+      {isGoogleFormMode ? (
         <div className="mt-6 space-y-4">
-          <p className="text-xs text-[#351202]/80">
-            You can embed your exact Google Form or Google Sheets Webhook here. The form below provides a live responsive frame.
-          </p>
-          <div className="w-full h-[580px] rounded-2xl overflow-hidden border border-[#EADBBA] bg-white">
+          <div className="w-full h-[620px] rounded-2xl overflow-hidden border border-[#EADBBA] dark:border-[#4D2612] bg-white shadow-inner">
             <iframe
-              src="https://docs.google.com/forms/d/e/1FAIpQLScU73iF8gH-tripdesk-sample/viewform?embedded=true"
+              src={googleFormUrl}
               width="100%"
               height="100%"
-              className="border-0"
-              title="TripDesk Google Form Inquiry"
+              className="border-0 w-full h-full"
+              title="TripDesk Official Google Form"
             >
-              Loading…
+              Loading inquiry form…
             </iframe>
           </div>
+          <p className="text-xs text-center text-[#351202]/60 dark:text-[#FEFAEE]/60">
+            🔒 Responses are saved directly to TripDesk Holidays Google Forms & verified spreadsheets.
+          </p>
         </div>
       ) : isSuccess ? (
         <motion.div
@@ -148,23 +145,23 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
           animate={{ opacity: 1, scale: 1 }}
           className="py-12 text-center space-y-4"
         >
-          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-inner">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h4 className="font-serif text-2xl font-bold text-[#351202]">
+          <h4 className="font-serif text-2xl font-bold text-[#351202] dark:text-[#FEFAEE]">
             Inquiry Dispatched Successfully!
           </h4>
-          <p className="text-sm text-[#351202]/80 max-w-md mx-auto leading-relaxed">
-            Thank you, <span className="font-semibold text-[#351202]">{name}</span>. A senior travel specialist has received your requirements for <span className="font-semibold text-[#DB9309]">{destination || 'your destination'}</span> and is assembling your custom itinerary.
+          <p className="text-sm text-[#351202]/80 dark:text-[#FEFAEE]/80 max-w-md mx-auto leading-relaxed">
+            Thank you, <span className="font-semibold text-[#351202] dark:text-[#FEFAEE]">{name}</span>. A senior travel specialist has received your requirements for <span className="font-semibold text-[#DB9309]">{destination || 'your destination'}</span>.
           </p>
-          <div className="p-4 bg-[#FDF7E7] rounded-2xl border border-[#EADBBA] max-w-sm mx-auto text-xs text-[#351202]/70 space-y-1">
-            <div>📞 Callback on: <span className="font-medium text-[#351202]">{phone}</span></div>
-            <div>✉️ Quotation via: <span className="font-medium text-[#351202]">{email}</span></div>
+          <div className="p-4 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612] max-w-sm mx-auto text-xs text-[#351202]/70 dark:text-[#FEFAEE]/70 space-y-1">
+            <div>📞 Callback on: <span className="font-medium text-[#351202] dark:text-[#FEFAEE]">{phone}</span></div>
+            <div>✉️ Quotation via: <span className="font-medium text-[#351202] dark:text-[#FEFAEE]">{email}</span></div>
           </div>
           <div className="pt-4">
             <button
               onClick={handleReset}
-              className="px-6 py-2.5 rounded-full bg-[#351202] hover:bg-[#4D1D05] text-white text-xs font-semibold shadow-md transition-all"
+              className="px-6 py-2.5 rounded-full bg-[#351202] dark:bg-[#DB9309] hover:bg-[#4D1D05] text-white text-xs font-semibold shadow-md transition-all"
             >
               Submit Another Inquiry
             </button>
@@ -173,9 +170,8 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
       ) : (
         <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Full Name */}
             <div>
-              <label className="block text-xs font-semibold text-[#351202] mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1.5 flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-[#DB9309]" /> Full Name *
               </label>
               <input
@@ -184,13 +180,12 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Vikram Malhotra"
-                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
               />
             </div>
 
-            {/* Mobile / WhatsApp */}
             <div>
-              <label className="block text-xs font-semibold text-[#351202] mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1.5 flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-[#DB9309]" /> Mobile / WhatsApp *
               </label>
               <input
@@ -199,13 +194,12 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
               />
             </div>
 
-            {/* Email Address */}
             <div>
-              <label className="block text-xs font-semibold text-[#351202] mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1.5 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-[#DB9309]" /> Email Address *
               </label>
               <input
@@ -214,13 +208,12 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="vikram@example.com"
-                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
               />
             </div>
 
-            {/* Destination */}
             <div>
-              <label className="block text-xs font-semibold text-[#351202] mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1.5 flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-[#DB9309]" /> Destination Interested *
               </label>
               <input
@@ -229,76 +222,54 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 placeholder="e.g. Kashmir, Kerala, Rajasthan..."
-                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
               />
             </div>
 
-            {/* Travel Date */}
             <div>
-              <label className="block text-xs font-semibold text-[#351202] mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1.5 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-[#DB9309]" /> Approximate Travel Date
               </label>
               <input
                 type="date"
                 value={travelDate}
                 onChange={(e) => setTravelDate(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
               />
             </div>
 
-            {/* Travelers & Budget */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#351202] mb-1.5 flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-[#DB9309]" /> Travelers
-                </label>
-                <select
-                  value={travelersCount}
-                  onChange={(e) => setTravelersCount(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
-                >
-                  <option value="1">1 Person (Solo)</option>
-                  <option value="2">2 Persons (Couple)</option>
-                  <option value="4">3-5 Persons (Family)</option>
-                  <option value="8">6+ Persons (Group)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#351202] mb-1.5">
-                  Budget (Per Person)
-                </label>
-                <select
-                  value={budgetRange}
-                  onChange={(e) => setBudgetRange(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
-                >
-                  <option value="Under ₹20,000">Under ₹20,000</option>
-                  <option value="₹20,000 - ₹35,000">₹20,000 - ₹35,000</option>
-                  <option value="₹35,000 - ₹60,000">₹35,000 - ₹60,000</option>
-                  <option value="₹60,000+ (Luxury)">₹60,000+ (Luxury)</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1.5 flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-[#DB9309]" /> Travelers Count
+              </label>
+              <select
+                value={travelersCount}
+                onChange={(e) => setTravelersCount(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none"
+              >
+                <option value="1">1 Person (Solo)</option>
+                <option value="2">2 Persons (Couple)</option>
+                <option value="4">3-5 Persons (Family)</option>
+                <option value="8">6+ Persons (Group)</option>
+              </select>
             </div>
           </div>
 
-          {/* Custom Notes */}
           <div>
-            <label className="block text-xs font-semibold text-[#351202] mb-1.5">
+            <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1.5">
               Custom Requirements & Notes
             </label>
             <textarea
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Tell us about special occasions (honeymoon, anniversary), preferred stay type, dietary preferences or places you want to include..."
-              className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] focus:outline-none focus:border-[#DB9309] bg-white text-xs sm:text-sm text-[#351202]"
+              placeholder="Tell us about special occasions, preferred stay type, dietary preferences..."
+              className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
             />
           </div>
 
-          {/* Privacy & Trust Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <div className="flex items-center gap-2 text-xs text-[#351202]/70">
+            <div className="flex items-center gap-2 text-xs text-[#351202]/70 dark:text-[#FEFAEE]/70">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>We never spam or share your contact data with third-parties.</span>
             </div>
@@ -306,12 +277,12 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#351202] hover:bg-[#4D1D05] active:scale-95 text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3 rounded-full bg-[#351202] dark:bg-[#DB9309] hover:bg-[#4D1D05] active:scale-95 text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>
                   <Clock className="w-4 h-4 animate-spin" />
-                  <span>Connecting to Desk...</span>
+                  <span>Submitting...</span>
                 </>
               ) : (
                 <>
@@ -326,4 +297,3 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
     </div>
   );
 }
-

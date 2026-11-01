@@ -8,16 +8,35 @@
   --color-brand-border: #EADBBA;
 }
 
+:root {
+  --bg-primary: #FEFAEE;
+  --bg-card: #FDF7E7;
+  --bg-surface: #FFFFFF;
+  --text-primary: #351202;
+  --text-muted: #694C38;
+  --border-brand: #EADBBA;
+}
+
+.dark {
+  --bg-primary: #120904;
+  --bg-card: #1D1008;
+  --bg-surface: #26160D;
+  --text-primary: #FEFAEE;
+  --text-muted: #EADBBA;
+  --border-brand: #4D2612;
+}
+
 body {
-  background-color: #FEFAEE;
-  color: #351202;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1, h2, h3, h4, .font-serif-title {
   font-family: var(--font-dm-serif), Georgia, serif;
-  color: #351202;
+  color: var(--text-primary);
 }
 
 /* Custom Scrollbar */
@@ -25,7 +44,7 @@ h1, h2, h3, h4, .font-serif-title {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #FEFAEE;
+  background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
   background: #DB9309;

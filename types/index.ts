@@ -20,6 +20,7 @@ export interface TourPackage {
   };
   price: number;
   originalPrice?: number;
+  hidePrice?: boolean; // Owner can toggle to hide exact price and show "Price on Request"
   featured: boolean;
   status: 'active' | 'draft' | 'featured';
   rating: number;
@@ -35,6 +36,16 @@ export interface TourPackage {
   itinerary: ItineraryDay[];
   groupSize?: string;
   bestTimeToVisit?: string;
+}
+
+export interface SiteSettings {
+  hideAllPrices: boolean; // Global toggle to hide prices across entire website
+  contactMode: 'google_form' | 'custom_form' | 'both';
+  googleFormEmbedUrl: string;
+  googleSheetsWebhookUrl?: string;
+  whatsappNumber: string;
+  contactEmail: string;
+  contactPhone: string;
 }
 
 export interface LeadInquiry {
@@ -60,4 +71,3 @@ export interface FilterState {
   duration: string;
   budget: string;
 }
-
