@@ -43,19 +43,32 @@ export interface SiteSettings {
   contactMode: 'google_form' | 'custom_form' | 'both';
   googleFormEmbedUrl: string;
   googleSheetsWebhookUrl?: string;
-  whatsappNumber: string;
+  // Dynamic Footer & Company Info
+  companyName: string;
+  tagline: string;
+  aboutText: string;
+  contactAddress: string;
   contactEmail: string;
   contactPhone: string;
+  contactLandline?: string;
+  whatsappNumber: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  twitterUrl?: string;
+  youtubeUrl?: string;
+  responseTimingText?: string;
+  copyrightText?: string;
 }
 
 export interface LeadInquiry {
   id: string;
+  type?: 'general_inquiry' | 'talk_to_specialist' | 'package_booking';
   name: string;
   email: string;
   phone: string;
-  destination: string;
+  destination?: string;
   travelDate?: string;
-  travelersCount: number;
+  travelersCount?: number;
   budgetRange?: string;
   notes?: string;
   packageId?: string;

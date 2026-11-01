@@ -1,17 +1,28 @@
 import { TourPackage, LeadInquiry, SiteSettings } from '@/types';
 import { INITIAL_PACKAGES } from './mockData';
 
-const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v2';
-const LEADS_STORAGE_KEY = 'tripdesk_leads_v2';
-const SETTINGS_STORAGE_KEY = 'tripdesk_settings_v2';
+const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v3';
+const LEADS_STORAGE_KEY = 'tripdesk_leads_v3';
+const SETTINGS_STORAGE_KEY = 'tripdesk_settings_v3';
 
 export const DEFAULT_SETTINGS: SiteSettings = {
   hideAllPrices: false,
   contactMode: 'google_form',
   googleFormEmbedUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScU73iF8gH-tripdesk-sample/viewform?embedded=true',
-  whatsappNumber: '+919876543210',
+  companyName: 'TripDesk Holidays',
+  tagline: 'Desk to Destination',
+  aboutText: 'TripDesk Holidays is your trusted travel architect, bridging the gap from your everyday desk to extraordinary destinations across incredible India. Handcrafted itineraries, transparent pricing, and 24/7 on-ground support.',
+  contactAddress: 'TripDesk Travel Hub, Connaught Place, New Delhi 110001, India',
   contactEmail: 'desk@tripdeskholidays.com',
-  contactPhone: '+91 98765 43210'
+  contactPhone: '+91 98765 43210',
+  contactLandline: '+91 11 4567 8900',
+  whatsappNumber: '+919876543210',
+  instagramUrl: 'https://instagram.com',
+  facebookUrl: 'https://facebook.com',
+  twitterUrl: 'https://twitter.com',
+  youtubeUrl: 'https://youtube.com',
+  responseTimingText: '⚡ Response time: Under 2 hours',
+  copyrightText: '© 2026 TripDesk Holidays LLP. All Rights Reserved.'
 };
 
 let memorySettings: SiteSettings = { ...DEFAULT_SETTINGS };
@@ -19,6 +30,7 @@ let memoryPackages: TourPackage[] = [...INITIAL_PACKAGES];
 let memoryLeads: LeadInquiry[] = [
   {
     id: 'lead-01',
+    type: 'package_booking',
     name: 'Aarav Sharma',
     email: 'aarav.sharma@example.com',
     phone: '+91 98765 43210',
@@ -31,6 +43,17 @@ let memoryLeads: LeadInquiry[] = [
     packageTitle: 'Kashmir: Paradise On Earth & Dal Lake Escapade',
     createdAt: '2026-10-28T10:30:00.000Z',
     status: 'contacted'
+  },
+  {
+    id: 'lead-02',
+    type: 'talk_to_specialist',
+    name: 'Vikram Mehta',
+    email: '',
+    phone: '+91 98200 12345',
+    destination: 'Immediate Callback Request',
+    notes: 'Requested urgent call from Talk to Specialist widget',
+    createdAt: '2026-11-01T12:15:00.000Z',
+    status: 'new'
   }
 ];
 
@@ -39,7 +62,7 @@ export function getStoredSettings(): SiteSettings {
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-      if (stored) return JSON.parse(stored);
+      if (stored) return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS));
     } catch {
       return memorySettings;
@@ -100,11 +123,11 @@ export function savePackage(pkg: Partial<TourPackage> & { title: string }): Tour
     id,
     slug,
     title: pkg.title,
-    tagline: pkg.tagline || 'Experience extraordinary journeys with TripDesk Holidays.',
+    tagline: pkg.tagline || '',
     state: pkg.state || 'Pan India',
     location: pkg.location || 'India',
     duration: pkg.duration || { days: 4, nights: 3 },
-    price: Number(pkg.price) || 15000,
+    price: Number(pkg.price) || 0,
     originalPrice: pkg.originalPrice ? Number(pkg.originalPrice) : undefined,
     hidePrice: Boolean(pkg.hidePrice),
     featured: Boolean(pkg.featured),
@@ -112,24 +135,15 @@ export function savePackage(pkg: Partial<TourPackage> & { title: string }): Tour
     rating: pkg.rating || 4.9,
     reviewsCount: pkg.reviewsCount || 1,
     bannerImage: pkg.bannerImage || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-    gallery: pkg.gallery && pkg.gallery.length ? pkg.gallery : [
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
-    ],
-    videoUrl: pkg.videoUrl || '',
-    overview: pkg.overview || 'An unforgettable experience curated by TripDesk.',
+    gallery: pkg.gallery && pkg.gallery.length ? pkg.gallery.filter(Boolean) : [pkg.bannerImage || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'],
+    videoUrl: pkg.videoUrl ? pkg.videoUrl.trim() : '',
+    overview: pkg.overview ? pkg.overview.trim() : '',
     theme: pkg.theme || 'Nature',
-    highlights: pkg.highlights && pkg.highlights.length ? pkg.highlights : ['Scenic sights', 'Curated experiences'],
-    inclusions: pkg.inclusions && pkg.inclusions.length ? pkg.inclusions : ['Breakfast', 'Transfers', 'Hotel Stay'],
-    exclusions: pkg.exclusions && pkg.exclusions.length ? pkg.exclusions : ['Personal Expenses', 'Airfare'],
-    itinerary: pkg.itinerary && pkg.itinerary.length ? pkg.itinerary : [
-      {
-        day: 1,
-        title: 'Arrival & Welcome',
-        description: 'Arrive at destination and get settled.',
-        meals: 'Dinner'
-      }
-    ],
-    groupSize: pkg.groupSize || 'All travelers',
+    highlights: pkg.highlights && pkg.highlights.length ? pkg.highlights.filter(Boolean) : [],
+    inclusions: pkg.inclusions && pkg.inclusions.length ? pkg.inclusions.filter(Boolean) : [],
+    exclusions: pkg.exclusions && pkg.exclusions.length ? pkg.exclusions.filter(Boolean) : [],
+    itinerary: pkg.itinerary && pkg.itinerary.length ? pkg.itinerary : [],
+    groupSize: pkg.groupSize || 'Customizable',
     bestTimeToVisit: pkg.bestTimeToVisit || 'Year-round'
   };
 
