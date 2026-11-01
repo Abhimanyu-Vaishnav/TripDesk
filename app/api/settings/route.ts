@@ -79,3 +79,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, message: 'Failed to update settings' }, { status: 500 });
   }
 }
+

@@ -18,29 +18,15 @@ export default function FloatingCTA() {
 
     setIsSubmitting(true);
     try {
-      saveLead({
+      await saveLead({
         type: 'talk_to_specialist',
         name: quickName.trim() || 'Website Visitor',
         phone: quickPhone.trim(),
         email: '',
-        destination: 'Talk to Specialist - Urgent Callback',
+        destination: 'Talk to Specialist - Priority Callback',
         travelersCount: 2,
-        notes: `Urgent callback requested from Floating Specialist widget by ${quickName || 'traveler'}.`
+        notes: `Priority callback requested from Floating Specialist widget by ${quickName.trim() || 'traveler'}.`
       });
-
-      try {
-        await fetch('/api/leads', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: quickName || 'Website Visitor',
-            phone: quickPhone,
-            type: 'talk_to_specialist'
-          })
-        });
-      } catch {
-        // Local save completed
-      }
 
       setIsSent(true);
       setTimeout(() => {

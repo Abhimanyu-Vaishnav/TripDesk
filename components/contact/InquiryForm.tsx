@@ -41,7 +41,7 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
     setIsSubmitting(true);
 
     try {
-      const savedLead = saveLead({
+      await saveLead({
         name,
         email,
         phone,
@@ -53,16 +53,6 @@ export default function InquiryForm({ initialPackage }: InquiryFormProps) {
         packageId: initialPackage?.id,
         packageTitle: initialPackage?.title
       });
-
-      try {
-        await fetch('/api/leads', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(savedLead)
-        });
-      } catch {
-        // Local fallback handled
-      }
 
       if (typeof window !== 'undefined') {
         confetti({

@@ -119,6 +119,17 @@ export default function OwnerDashboardPage() {
     }
   }, []);
 
+  // Poll for new leads every 8 seconds when on dashboard
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const interval = setInterval(() => {
+      fetchCloudLeads().then(cloudLeads => {
+        if (cloudLeads) setLeads(cloudLeads);
+      });
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
   const loadDashboardData = () => {
     setPackages(getStoredPackages());
     setLeads(getStoredLeads());
