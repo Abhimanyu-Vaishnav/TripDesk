@@ -67,32 +67,32 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-[#FEFAEE]/80">
               <li>
-                <Link href="/#packages" className="hover:text-[#DB9309] transition-colors">
+                <Link href="/packages/kashmir-paradise-on-earth" className="hover:text-[#DB9309] transition-colors">
                   Kashmir & Dal Lake
                 </Link>
               </li>
               <li>
-                <Link href="/#packages" className="hover:text-[#DB9309] transition-colors">
+                <Link href="/packages/himachal-manali-kasol-spiti-gateway" className="hover:text-[#DB9309] transition-colors">
                   Himachal & Parvati Trail
                 </Link>
               </li>
               <li>
-                <Link href="/#packages" className="hover:text-[#DB9309] transition-colors">
+                <Link href="/packages/rajasthan-royal-heritage-jaipur-udaipur-jodhpur" className="hover:text-[#DB9309] transition-colors">
                   Royal Rajasthan Forts
                 </Link>
               </li>
               <li>
-                <Link href="/#packages" className="hover:text-[#DB9309] transition-colors">
+                <Link href="/packages/kerala-gods-own-country-backwaters-munnar" className="hover:text-[#DB9309] transition-colors">
                   Kerala Backwaters
                 </Link>
               </li>
               <li>
-                <Link href="/#packages" className="hover:text-[#DB9309] transition-colors">
+                <Link href="/packages/andaman-emerald-islands-havelock-scuba-paradise" className="hover:text-[#DB9309] transition-colors">
                   Andaman Emerald Coral
                 </Link>
               </li>
               <li>
-                <Link href="/#packages" className="hover:text-[#DB9309] transition-colors">
+                <Link href="/packages/north-east-meghalaya-living-roots-cherrapunji" className="hover:text-[#DB9309] transition-colors">
                   Meghalaya Waterfalls
                 </Link>
               </li>
@@ -166,13 +166,15 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FEFAEE]/60 gap-4">
+        {/* Bottom bar with Verified Links to Privacy Policy, Terms, Sitemap & Staff Portal */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FEFAEE]/70 gap-4">
           <p>{settings.copyrightText || DEFAULT_SETTINGS.copyrightText} Crafted with <Heart className="w-3.5 h-3.5 inline text-[#DB9309] fill-[#DB9309]" /> for passionate travelers.</p>
-          <div className="flex items-center gap-6">
-            <Link href="/#contact" className="hover:text-[#FEFAEE]">Privacy Policy</Link>
-            <Link href="/#contact" className="hover:text-[#FEFAEE]">Terms of Service</Link>
-            <Link href="/dashboard" className="hover:text-[#DB9309] text-[11px] opacity-75">Staff Portal</Link>
+          <div className="flex flex-wrap items-center gap-6">
+            <Link href="/privacy-policy" className="hover:text-[#DB9309] transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-[#DB9309] transition-colors">Terms of Service</Link>
+            <Link href="/sitemap-page" className="hover:text-[#DB9309] transition-colors">Sitemap</Link>
+            <a href="/sitemap.xml" target="_blank" className="hover:text-[#DB9309] transition-colors text-[11px] opacity-75">XML</a>
+            <Link href="/dashboard" className="hover:text-[#DB9309] transition-colors text-[11px] opacity-75">Staff Portal</Link>
           </div>
         </div>
       </div>
