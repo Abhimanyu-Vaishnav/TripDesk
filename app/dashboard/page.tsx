@@ -329,7 +329,7 @@ export default function OwnerDashboardPage() {
                 required
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder="tripdesk_owner"
+                placeholder="Enter username"
                 className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
               />
             </div>
@@ -344,13 +344,9 @@ export default function OwnerDashboardPage() {
                 required
                 value={passkeyInput}
                 onChange={(e) => setPasskeyInput(e.target.value)}
-                placeholder="Enter master passkey..."
+                placeholder="Enter password"
                 className="w-full px-4 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
               />
-              <div className="mt-2 p-2.5 rounded-xl bg-[#FDF7E7] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-[11px] text-[#351202]/70 dark:text-[#FEFAEE]/70 space-y-0.5">
-                <div>User: <code className="text-[#DB9309] font-bold">tripdesk_owner</code></div>
-                <div>Pass: <code className="text-[#DB9309] font-bold">TripDesk@2026#Secure!</code></div>
-              </div>
             </div>
 
             {authError && (
