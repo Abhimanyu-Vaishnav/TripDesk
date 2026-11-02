@@ -48,13 +48,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => {
     const nextTheme: Theme = theme === 'light' ? 'dark' : 'light';
+    // Immediately apply to DOM class first for 0ms visual switch
+    applyTheme(nextTheme);
     setTheme(nextTheme);
     try {
       localStorage.setItem('tripdesk_theme', nextTheme);
     } catch (e) {
       console.error(e);
     }
-    applyTheme(nextTheme);
   };
 
   return (

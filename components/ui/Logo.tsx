@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
+import React from 'react';
 import Link from 'next/link';
 
 interface LogoProps {
@@ -17,76 +16,58 @@ export default function Logo({
   className = '',
   showTagline = true
 }: LogoProps) {
-  const [imageError, setImageError] = useState(false);
+  // Height rules: slightly larger for bold, legible presence in header
+  const logoHeightClass =
+    size === 'lg'
+      ? 'h-14 sm:h-16'
+      : size === 'sm'
+      ? 'h-8 sm:h-9'
+      : 'h-10 sm:h-12'; // default md: 44px-48px sharp display
 
-  const getLogoSrc = () => {
-    switch (variant) {
-      case 'white':
-        // Wordmark Main Logo inverted for dark mode
-        return '/assets/logo/Wordmark Main Logo inverted.png';
-      case 'round':
-        return '/assets/logo/Main Round Logo.png';
-      case 'dark':
-        return '/assets/logo/Wordmark Main Logo.png';
-      case 'main':
-      default:
-        // Wordmark Main Logo for light mode
-        return '/assets/logo/Wordmark Main Logo.png';
-    }
-  };
+  // If a specific variant is requested (like white in footer), honor it.
+  // Otherwise, render both logos via CSS dark:hidden and hidden dark:block so the switch is 0ms instant without React re-render lag!
+  if (variant === 'white') {
+    return (
+      <Link href="/" className={`inline-flex items-center group ${className}`}>
+        <img
+          src="/assets/logo/Wordmark Main Logo inverted.png"
+          alt="TripDesk Holidays Logo"
+          className={`${logoHeightClass} w-auto object-contain transition-transform duration-200 group-hover:scale-105`}
+          fetchPriority="high"
+        />
+      </Link>
+    );
+  }
 
-  const getDimensions = () => {
-    switch (size) {
-      case 'sm':
-        return { width: 130, height: 42 };
-      case 'lg':
-        return { width: 230, height: 75 };
-      case 'md':
-      default:
-        return { width: 180, height: 58 };
-    }
-  };
-
-  const { width, height } = getDimensions();
+  if (variant === 'round') {
+    return (
+      <Link href="/" className={`inline-flex items-center group ${className}`}>
+        <img
+          src="/assets/logo/Main Round Logo.png"
+          alt="TripDesk Holidays Logo"
+          className={`${logoHeightClass} w-auto object-contain transition-transform duration-200 group-hover:scale-105`}
+        />
+      </Link>
+    );
+  }
 
   return (
-    <Link href="/" className={`inline-flex items-center gap-2 group ${className}`}>
-      {!imageError ? (
-        <div className="relative overflow-hidden flex items-center">
-          <Image
-            src={getLogoSrc()}
-            alt="TripDesk Holidays Logo"
-            width={width}
-            height={height}
-            priority
-            onError={() => setImageError(true)}
-            className="object-contain h-auto transition-transform duration-300 group-hover:scale-105"
-            style={{ maxHeight: size === 'lg' ? '65px' : size === 'sm' ? '36px' : '48px', width: 'auto' }}
-          />
-        </div>
-      ) : (
-        /* Dynamic SVG fallback matching brand styling if logo asset cannot be rendered */
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#DB9309] to-[#351202] flex items-center justify-center text-white shadow-md font-bold text-lg tracking-wider">
-            TD
-          </div>
-          <div className="flex flex-col">
-            <span
-              className={`font-serif text-xl font-bold tracking-tight ${
-                variant === 'white' ? 'text-[#FEFAEE]' : 'text-[#351202]'
-              }`}
-            >
-              TripDesk
-            </span>
-            {showTagline && (
-              <span className="text-[10px] uppercase tracking-widest font-semibold text-[#DB9309] -mt-1">
-                Desk to Destination
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+    <Link href="/" className={`inline-flex items-center group ${className}`}>
+      {/* Light Mode Logo: Wordmark Main Logo (Instant CSS visibility switch) */}
+      <img
+        src="/assets/logo/Wordmark Main Logo.png"
+        alt="TripDesk Holidays Logo"
+        className={`${logoHeightClass} w-auto object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105`}
+        fetchPriority="high"
+      />
+
+      {/* Dark Mode Logo: Wordmark Main Logo inverted (Instant CSS visibility switch) */}
+      <img
+        src="/assets/logo/Wordmark Main Logo inverted.png"
+        alt="TripDesk Holidays Logo"
+        className={`${logoHeightClass} w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105`}
+        fetchPriority="high"
+      />
     </Link>
   );
 }
-
