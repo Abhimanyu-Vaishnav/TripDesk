@@ -168,11 +168,35 @@ export default function OwnerDashboardPage() {
     sessionStorage.removeItem('tripdesk_dashboard_auth');
   };
 
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+  const [settingsErrorMessage, setSettingsErrorMessage] = useState('');
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    await saveStoredSettings(settings);
-    setSettingsSavedMessage(true);
-    setTimeout(() => setSettingsSavedMessage(false), 3000);
+    setIsSavingSettings(true);
+    setSettingsErrorMessage('');
+    try {
+      // 1. Direct save to storage & supabase
+      await saveStoredSettings(settings);
+
+      // 2. Also call test-save directly to guarantee Supabase update
+      const res = await fetch('/api/test-save-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+      });
+      const resJson = await res.json();
+      if (!resJson.success) {
+        setSettingsErrorMessage(resJson.updateError || 'Failed to update database');
+      } else {
+        setSettingsSavedMessage(true);
+        setTimeout(() => setSettingsSavedMessage(false), 4000);
+      }
+    } catch (err: unknown) {
+      setSettingsErrorMessage(String(err));
+    } finally {
+      setIsSavingSettings(false);
+    }
   };
 
   const handleOpenEditor = (pkg?: TourPackage) => {
@@ -982,16 +1006,24 @@ export default function OwnerDashboardPage() {
             {settingsSavedMessage && (
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs flex items-center gap-2">
                 <Check className="w-4 h-4" />
-                <span>Footer details and global settings updated successfully!</span>
+                <span>Footer details and global settings updated successfully in Cloud Database!</span>
+              </div>
+            )}
+
+            {settingsErrorMessage && (
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 rounded-xl text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                <span>Database Error: {settingsErrorMessage}</span>
               </div>
             )}
 
             <button
               type="submit"
-              className="px-6 py-3 rounded-xl bg-[#351202] dark:bg-[#DB9309] text-white font-semibold text-xs shadow-md flex items-center gap-2"
+              disabled={isSavingSettings}
+              className="px-6 py-3 rounded-xl bg-[#351202] dark:bg-[#DB9309] text-white font-semibold text-xs shadow-md flex items-center gap-2 disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              Save Footer & Global Settings
+              {isSavingSettings ? 'Saving to Cloud Database...' : 'Save Footer & Global Settings'}
             </button>
           </form>
         )}
