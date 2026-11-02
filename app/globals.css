@@ -56,9 +56,9 @@ h1, h2, h3, h4, .font-serif, .font-serif-title {
   font-family: 'DM Serif Display Custom', var(--font-dm-serif), Georgia, serif;
 }
 
-/* Map any utility .bg-white to #FEFAEE theme cream across light mode */
-:root .bg-white {
-  background-color: #FEFAEE !important;
+/* Map any utility .bg-white to #FEFAEE in light mode ONLY without overriding dark:bg-* */
+html:not(.dark) .bg-white {
+  background-color: #FEFAEE;
 }
 
 /* Optimize browser rendering & scrolling smoothness */
