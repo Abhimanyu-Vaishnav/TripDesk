@@ -22,7 +22,7 @@
 :root {
   --bg-primary: #FEFAEE;
   --bg-card: #FDF7E7;
-  --bg-surface: #FFFFFF;
+  --bg-surface: #FEFAEE;
   --text-primary: #351202;
   --text-muted: #694C38;
   --border-brand: #EADBBA;
@@ -54,6 +54,25 @@ body {
 
 h1, h2, h3, h4, .font-serif, .font-serif-title {
   font-family: 'DM Serif Display Custom', var(--font-dm-serif), Georgia, serif;
+}
+
+/* Map any utility .bg-white to #FEFAEE theme cream across light mode */
+:root .bg-white {
+  background-color: #FEFAEE !important;
+}
+
+/* Optimize browser rendering & scrolling smoothness */
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hardware accelerated transitions for snappy performance */
+* {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Custom Scrollbar */

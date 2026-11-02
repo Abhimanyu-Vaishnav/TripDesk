@@ -117,7 +117,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
             className="bg-[#FEFAEE]/95 dark:bg-[#1D1008]/95 backdrop-blur-md p-3.5 sm:p-4 rounded-3xl shadow-2xl border-2 border-[#DB9309] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-left transition-colors"
           >
             {/* 1. State / Region */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+            <div className="p-2 sm:p-3 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
               <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-[#DB9309]" /> State / Region
               </label>
@@ -127,7 +127,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
                 className="w-full text-xs sm:text-sm font-semibold text-[#351202] dark:text-[#FEFAEE] bg-transparent focus:outline-none cursor-pointer"
               >
                 {STATES_LIST.map((st) => (
-                  <option key={st} value={st} className="bg-white dark:bg-[#1D1008] text-[#351202] dark:text-[#FEFAEE]">
+                  <option key={st} value={st} className="bg-[#FEFAEE] dark:bg-[#1D1008] text-[#351202] dark:text-[#FEFAEE]">
                     {st}
                   </option>
                 ))}
@@ -135,7 +135,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
             </div>
 
             {/* 2. Destination Search Keyword */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+            <div className="p-2 sm:p-3 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
               <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
                 <Compass className="w-3.5 h-3.5 text-[#DB9309]" /> Destination / City
               </label>
@@ -149,7 +149,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
             </div>
 
             {/* 3. Duration: User Input (e.g. 3, 5, 7 Days) */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+            <div className="p-2 sm:p-3 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
               <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-[#DB9309]" /> Trip Duration
               </label>
