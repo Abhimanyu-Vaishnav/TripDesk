@@ -43,7 +43,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   youtubeUrl: 'https://youtube.com',
   responseTimingText: '⚡ Response time: Under 2 hours',
   copyrightText: '© 2026 TripDesk Holidays LLP. All Rights Reserved.',
-  heroTitle: 'From Desk to Dream Destination',
+  heroTitle: '',
   heroSlides: DEFAULT_HERO_SLIDES
 };
 

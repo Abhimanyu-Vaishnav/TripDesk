@@ -96,11 +96,11 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
           transition={{ duration: 0.3 }}
           className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-[#FEFAEE] tracking-tight leading-[1.15] max-w-4xl drop-shadow-[0_4px_14px_rgba(0,0,0,0.9)]"
         >
-          {headline ? (
+          {headline && headline.trim() !== '' && headline !== 'From Desk to Dream Destination' ? (
             <span>{headline}</span>
           ) : (
             <>
-              From <span className="text-[#DB9309] italic font-semibold">Desk</span> to Dream Destination
+              From <span className="text-[#DB9309] italic font-normal tracking-wide inline-block transform -skew-x-6 mx-1">Desk</span> to Dream Destination
             </>
           )}
         </motion.h1>
