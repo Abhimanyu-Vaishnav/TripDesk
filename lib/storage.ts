@@ -139,7 +139,40 @@ export async function saveStoredSettings(settings: SiteSettings) {
     }
   }
 
-  // Save via API (persists to server & Supabase regardless of client env)
+  // 1. Direct Client Supabase upsert (instant cloud write)
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('site_settings').upsert({
+        id: 'primary_settings',
+        hide_all_prices: settings.hideAllPrices,
+        contact_mode: settings.contactMode,
+        google_form_embed_url: settings.googleFormEmbedUrl,
+        company_name: settings.companyName,
+        tagline: settings.tagline,
+        about_text: settings.aboutText,
+        contact_address: settings.contactAddress,
+        contact_email: settings.contactEmail,
+        contact_phone: settings.contactPhone,
+        contact_landline: settings.contactLandline,
+        whatsapp_number: settings.whatsappNumber,
+        instagram_url: settings.instagramUrl,
+        facebook_url: settings.facebookUrl,
+        twitter_url: settings.twitterUrl,
+        youtube_url: settings.youtubeUrl,
+        linkedin_url: settings.linkedinUrl,
+        pinterest_url: settings.pinterestUrl,
+        response_timing_text: settings.responseTimingText,
+        copyright_text: settings.copyrightText,
+        hero_title: settings.heroTitle,
+        hero_slides: settings.heroSlides,
+        updated_at: new Date().toISOString()
+      });
+    } catch (dbErr) {
+      console.warn('Direct client Supabase save error:', dbErr);
+    }
+  }
+
+  // 2. Also save via Next.js Server API route
   try {
     await fetch('/api/settings', {
       method: 'POST',

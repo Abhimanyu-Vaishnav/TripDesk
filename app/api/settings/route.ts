@@ -3,7 +3,10 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { DEFAULT_SETTINGS } from '@/lib/storage';
 import { SiteSettings } from '@/types';
 
-// Server-side fallback memory cache
+// Force dynamic execution (never cache GET requests on edge/server)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 let cachedSettings: SiteSettings = { ...DEFAULT_SETTINGS };
 
 export async function GET() {
@@ -14,6 +17,10 @@ export async function GET() {
         .select('*')
         .eq('id', 'primary_settings')
         .maybeSingle();
+
+      if (error) {
+        console.error('Supabase get settings error:', error);
+      }
 
       if (!error && data) {
         cachedSettings = {
@@ -53,8 +60,10 @@ export async function POST(request: Request) {
     const body: SiteSettings = await request.json();
     cachedSettings = { ...DEFAULT_SETTINGS, ...body };
 
+    let dbError = null;
+
     if (isSupabaseConfigured && supabase) {
-      await supabase.from('site_settings').upsert({
+      const { error } = await supabase.from('site_settings').upsert({
         id: 'primary_settings',
         hide_all_prices: cachedSettings.hideAllPrices,
         contact_mode: cachedSettings.contactMode,
@@ -79,12 +88,20 @@ export async function POST(request: Request) {
         hero_slides: cachedSettings.heroSlides,
         updated_at: new Date().toISOString()
       });
+
+      if (error) {
+        console.error('Supabase site_settings upsert error:', error);
+        dbError = error.message;
+      }
     }
 
-    return NextResponse.json({ success: true, settings: cachedSettings });
+    return NextResponse.json({
+      success: !dbError,
+      settings: cachedSettings,
+      dbError
+    });
   } catch (err) {
     console.error('Error saving settings API:', err);
     return NextResponse.json({ success: false, message: 'Failed to update settings' }, { status: 500 });
   }
 }
-

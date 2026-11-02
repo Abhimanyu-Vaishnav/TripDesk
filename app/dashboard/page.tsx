@@ -168,9 +168,9 @@ export default function OwnerDashboardPage() {
     sessionStorage.removeItem('tripdesk_dashboard_auth');
   };
 
-  const handleSaveSettings = (e: React.FormEvent) => {
+  const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    saveStoredSettings(settings);
+    await saveStoredSettings(settings);
     setSettingsSavedMessage(true);
     setTimeout(() => setSettingsSavedMessage(false), 3000);
   };
