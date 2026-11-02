@@ -26,23 +26,23 @@ export default function Logo({
       case 'round':
         return '/assets/logo/Main Round Logo.png';
       case 'dark':
-        return '/assets/logo/wordmark-dark.png';
+        return '/assets/logo/Wordmark Black Logo.png';
       case 'main':
       default:
-        // Use Main Logo.png in light mode as requested
-        return '/assets/logo/Main Logo.png';
+        // Use Wordmark Black Logo for light mode: exact same shape/aspect ratio (1058x485) as white wordmark
+        return '/assets/logo/Wordmark Black Logo.png';
     }
   };
 
   const getDimensions = () => {
     switch (size) {
       case 'sm':
-        return { width: 120, height: 40 };
+        return { width: 130, height: 42 };
       case 'lg':
-        return { width: 220, height: 75 };
+        return { width: 230, height: 75 };
       case 'md':
       default:
-        return { width: 170, height: 58 };
+        return { width: 180, height: 58 };
     }
   };
 
