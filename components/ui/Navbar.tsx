@@ -35,8 +35,8 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#FEFAEE]/95 dark:bg-[#120904]/95 backdrop-blur-md shadow-md py-3 border-b border-[#EADBBA]/60 dark:border-[#4D2612]'
-          : 'bg-[#FEFAEE]/85 dark:bg-[#120904]/85 backdrop-blur-sm py-4 md:py-5 border-b border-transparent'
+          ? 'bg-[#FEFAEE]/70 dark:bg-[#120904]/70 backdrop-blur-xl shadow-lg py-3 border-b border-[#EADBBA]/30 dark:border-[#4D2612]/30'
+          : 'bg-[#FEFAEE]/40 dark:bg-black/30 backdrop-blur-md py-4 md:py-5 border-b border-white/10 dark:border-white/5 shadow-sm'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">

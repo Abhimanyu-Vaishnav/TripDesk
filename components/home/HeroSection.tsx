@@ -67,8 +67,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
         </AnimatePresence>
 
         {/* Lighter, high-visibility overlay (enhanced visibility without drowning images) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/45 to-black/30 dark:from-black/75 dark:via-black/55 dark:to-black/45" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FEFAEE]/25 dark:from-[#120904]/40 via-transparent to-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/35 to-black/20 dark:from-black/60 dark:via-black/40 dark:to-black/30" />
       </div>
 
       {/* Slide Indicators on Bottom Right */}
@@ -90,12 +89,12 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
       )}
 
       <div className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center">
-        {/* Main Clean Headline */}
+        {/* Main Clean Headline: theme cream color text, Desk in yellow #DB9309 italic */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold !text-white tracking-tight leading-[1.15] max-w-4xl drop-shadow-[0_3px_10px_rgba(0,0,0,0.8)]"
+          className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-[#FEFAEE] tracking-tight leading-[1.15] max-w-4xl drop-shadow-[0_4px_14px_rgba(0,0,0,0.9)]"
         >
           {headline ? (
             <span>{headline}</span>
