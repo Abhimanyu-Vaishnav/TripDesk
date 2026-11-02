@@ -22,15 +22,16 @@ export default function Logo({
   const getLogoSrc = () => {
     switch (variant) {
       case 'white':
-        return '/assets/logo/wordmark-white.png';
+        // Wordmark Main Logo inverted for dark mode
+        return '/assets/logo/Wordmark Main Logo inverted.png';
       case 'round':
         return '/assets/logo/Main Round Logo.png';
       case 'dark':
-        return '/assets/logo/Wordmark Black Logo.png';
+        return '/assets/logo/Wordmark Main Logo.png';
       case 'main':
       default:
-        // Use Wordmark Black Logo for light mode: exact same shape/aspect ratio (1058x485) as white wordmark
-        return '/assets/logo/Wordmark Black Logo.png';
+        // Wordmark Main Logo for light mode
+        return '/assets/logo/Wordmark Main Logo.png';
     }
   };
 

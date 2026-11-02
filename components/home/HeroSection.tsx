@@ -182,7 +182,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/95 text-xs sm:text-sm font-medium drop-shadow"
+          className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-[#FEFAEE] text-xs sm:text-sm font-medium drop-shadow"
         >
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-[#DB9309]" />
