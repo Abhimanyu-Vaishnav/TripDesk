@@ -4,44 +4,30 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Calendar, Compass, ShieldCheck } from 'lucide-react';
 import { STATES_LIST } from '@/lib/mockData';
+import { DEFAULT_HERO_SLIDES } from '@/lib/storage';
 
 interface HeroSectionProps {
   onSearch: (filters: { state: string; destination: string; budget: string; duration: string }) => void;
+  slides?: { url: string; title: string }[];
+  headline?: string;
 }
 
-// Cinematic Background slides representing incredible Indian destinations
-const HERO_SLIDES = [
-  {
-    url: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1920&q=80',
-    title: 'Kerala Backwaters & Houseboats'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=1920&q=80',
-    title: 'Kashmir Valley & Snow Peaks'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=1920&q=80',
-    title: 'Rajasthan Royal Heritage Palaces'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1920&q=80',
-    title: 'Goa Coastal Serenity'
-  }
-];
-
-export default function HeroSection({ onSearch }: HeroSectionProps) {
+export default function HeroSection({ onSearch, slides, headline }: HeroSectionProps) {
   const [selectedState, setSelectedState] = useState('All States');
   const [searchDestination, setSearchDestination] = useState('');
   const [customDays, setCustomDays] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const activeSlides = slides && slides.length > 0 ? slides : DEFAULT_HERO_SLIDES;
+
   // Auto-slide every 6 seconds
   useEffect(() => {
+    if (activeSlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [activeSlides.length]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,8 +58,8 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
             className="absolute inset-0"
           >
             <img
-              src={HERO_SLIDES[currentSlide].url}
-              alt={HERO_SLIDES[currentSlide].title}
+              src={activeSlides[currentSlide]?.url || DEFAULT_HERO_SLIDES[0].url}
+              alt={activeSlides[currentSlide]?.title || 'TripDesk Destination'}
               fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
               className="w-full h-full object-cover object-center"
             />
@@ -86,30 +72,38 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
       </div>
 
       {/* Slide Indicators on Bottom Right */}
-      <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
-        {HERO_SLIDES.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentSlide(idx)}
-            className={`transition-all duration-300 rounded-full ${
-              idx === currentSlide
-                ? 'w-6 h-2 bg-[#DB9309]'
-                : 'w-2 h-2 bg-white/50 hover:bg-white/80'
-            }`}
-            aria-label={`Go to slide ${idx + 1}`}
-          />
-        ))}
-      </div>
+      {activeSlides.length > 1 && (
+        <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+          {activeSlides.map((item: { url: string; title: string }, idx: number) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`transition-all duration-300 rounded-full ${
+                idx === currentSlide
+                  ? 'w-6 h-2 bg-[#DB9309]'
+                  : 'w-2 h-2 bg-white/50 hover:bg-white/80'
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center">
-        {/* Main Clean Headline: Bold (not too heavy), no underline on Desk */}
+        {/* Main Clean Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold !text-white tracking-tight leading-[1.15] max-w-4xl drop-shadow-[0_3px_10px_rgba(0,0,0,0.8)]"
         >
-          From <span className="text-[#DB9309] italic font-semibold">Desk</span> to Dream Destination
+          {headline ? (
+            <span>{headline}</span>
+          ) : (
+            <>
+              From <span className="text-[#DB9309] italic font-semibold">Desk</span> to Dream Destination
+            </>
+          )}
         </motion.h1>
 
         {/* Clean, Breathable Spacing with Interactive Search Bar */}

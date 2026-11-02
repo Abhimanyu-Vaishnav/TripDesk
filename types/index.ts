@@ -58,6 +58,9 @@ export interface SiteSettings {
   youtubeUrl?: string;
   responseTimingText?: string;
   copyrightText?: string;
+  // Hero & Homepage Customization
+  heroTitle?: string;
+  heroSlides?: { url: string; title: string }[];
 }
 
 export interface LeadInquiry {

@@ -834,6 +834,98 @@ export default function OwnerDashboardPage() {
               </div>
             </div>
 
+            {/* 4. Homepage Hero & Sliding Background Management */}
+            <div className="bg-white dark:bg-[#1D1008] p-6 rounded-3xl border border-[#EADBBA] dark:border-[#4D2612] shadow-sm space-y-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-serif text-xl font-bold text-[#351202] dark:text-[#FEFAEE] flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-[#DB9309]" />
+                    Homepage Slideshow & Hero Controls
+                  </h3>
+                  <p className="text-xs text-[#351202]/70 dark:text-[#FEFAEE]/70 mt-0.5">
+                    Customize background slides, add/remove images, and manage titles live.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentSlides = settings.heroSlides || [];
+                    setSettings({
+                      ...settings,
+                      heroSlides: [
+                        ...currentSlides,
+                        { url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80', title: 'New Destination' }
+                      ]
+                    });
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#DB9309] hover:bg-[#c48107] text-white text-xs font-semibold flex items-center gap-1.5 shadow"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add Slide
+                </button>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                  Custom Hero Main Title (Optional override)
+                </label>
+                <input
+                  type="text"
+                  value={settings.heroTitle || ''}
+                  onChange={(e) => setSettings({ ...settings, heroTitle: e.target.value })}
+                  placeholder="From Desk to Dream Destination"
+                  className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE]">
+                  Slideshow Images ({settings.heroSlides?.length || 0} active slides)
+                </label>
+                {(settings.heroSlides || []).map((slide, idx) => (
+                  <div key={idx} className="p-3 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612] flex flex-col sm:flex-row items-center gap-3">
+                    <div className="relative w-20 h-14 rounded-lg overflow-hidden bg-black/10 shrink-0">
+                      <img src={slide.url} alt={slide.title} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+                      <input
+                        type="url"
+                        value={slide.url}
+                        onChange={(e) => {
+                          const updated = [...(settings.heroSlides || [])];
+                          updated[idx] = { ...updated[idx], url: e.target.value };
+                          setSettings({ ...settings, heroSlides: updated });
+                        }}
+                        placeholder="Image URL (Unsplash or direct image link)"
+                        className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs"
+                      />
+                      <input
+                        type="text"
+                        value={slide.title}
+                        onChange={(e) => {
+                          const updated = [...(settings.heroSlides || [])];
+                          updated[idx] = { ...updated[idx], title: e.target.value };
+                          setSettings({ ...settings, heroSlides: updated });
+                        }}
+                        placeholder="Slide Title / Caption (e.g. Kashmir Peaks)"
+                        className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = (settings.heroSlides || []).filter((_, i) => i !== idx);
+                        setSettings({ ...settings, heroSlides: updated });
+                      }}
+                      className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                      title="Delete Slide"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {settingsSavedMessage && (
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs flex items-center gap-2">
                 <Check className="w-4 h-4" />

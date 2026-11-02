@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS site_settings (
   youtube_url TEXT DEFAULT '',
   response_timing_text TEXT DEFAULT '⚡ Response time: Under 2 hours',
   copyright_text TEXT DEFAULT '© 2026 TripDesk Holidays LLP. All Rights Reserved.',
+  hero_title TEXT DEFAULT 'From Desk to Dream Destination',
+  hero_slides JSONB DEFAULT '[]',
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 

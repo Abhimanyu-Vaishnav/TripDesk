@@ -112,7 +112,11 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <HeroSection onSearch={handleHeroSearch} />
+        <HeroSection
+          onSearch={handleHeroSearch}
+          slides={settings?.heroSlides}
+          headline={settings?.heroTitle}
+        />
 
         {/* Explore States Grid */}
         <ExploreStatesSection

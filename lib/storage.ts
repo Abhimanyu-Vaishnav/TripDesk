@@ -6,6 +6,25 @@ const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v3';
 const LEADS_STORAGE_KEY = 'tripdesk_leads_v3';
 const SETTINGS_STORAGE_KEY = 'tripdesk_settings_v3';
 
+export const DEFAULT_HERO_SLIDES = [
+  {
+    url: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1920&q=80',
+    title: 'Kerala Backwaters & Houseboats'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=1920&q=80',
+    title: 'Kashmir Valley & Snow Peaks'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=1920&q=80',
+    title: 'Rajasthan Royal Heritage Palaces'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1920&q=80',
+    title: 'Goa Coastal Serenity'
+  }
+];
+
 export const DEFAULT_SETTINGS: SiteSettings = {
   hideAllPrices: false,
   contactMode: 'google_form',
@@ -23,7 +42,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   twitterUrl: 'https://twitter.com',
   youtubeUrl: 'https://youtube.com',
   responseTimingText: '⚡ Response time: Under 2 hours',
-  copyrightText: '© 2026 TripDesk Holidays LLP. All Rights Reserved.'
+  copyrightText: '© 2026 TripDesk Holidays LLP. All Rights Reserved.',
+  heroTitle: 'From Desk to Dream Destination',
+  heroSlides: DEFAULT_HERO_SLIDES
 };
 
 let memorySettings: SiteSettings = { ...DEFAULT_SETTINGS };
@@ -92,7 +113,9 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
           twitterUrl: data.twitter_url || DEFAULT_SETTINGS.twitterUrl,
           youtubeUrl: data.youtube_url || DEFAULT_SETTINGS.youtubeUrl,
           responseTimingText: data.response_timing_text || DEFAULT_SETTINGS.responseTimingText,
-          copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText
+          copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
+          heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
+          heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_HERO_SLIDES
         };
         saveStoredSettings(cloudSettings);
         return cloudSettings;

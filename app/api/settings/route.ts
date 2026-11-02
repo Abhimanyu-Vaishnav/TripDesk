@@ -33,7 +33,9 @@ export async function GET() {
           twitterUrl: data.twitter_url || DEFAULT_SETTINGS.twitterUrl,
           youtubeUrl: data.youtube_url || DEFAULT_SETTINGS.youtubeUrl,
           responseTimingText: data.response_timing_text || DEFAULT_SETTINGS.responseTimingText,
-          copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText
+          copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
+          heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
+          heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_SETTINGS.heroSlides
         };
       }
     } catch (err) {
@@ -69,6 +71,8 @@ export async function POST(request: Request) {
         youtube_url: cachedSettings.youtubeUrl,
         response_timing_text: cachedSettings.responseTimingText,
         copyright_text: cachedSettings.copyrightText,
+        hero_title: cachedSettings.heroTitle,
+        hero_slides: cachedSettings.heroSlides,
         updated_at: new Date().toISOString()
       });
     }

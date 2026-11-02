@@ -24,12 +24,13 @@ export default function Logo({
       case 'white':
         return '/assets/logo/wordmark-white.png';
       case 'round':
-        return '/assets/logo/logo-round.png';
+        return '/assets/logo/Main Round Logo.png';
       case 'dark':
         return '/assets/logo/wordmark-dark.png';
       case 'main':
       default:
-        return '/assets/logo/main-logo.png';
+        // Use Main Logo.png in light mode as requested
+        return '/assets/logo/Main Logo.png';
     }
   };
 
