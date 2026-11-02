@@ -85,9 +85,19 @@ export default function HomePage() {
       if (!match) return false;
     }
 
-    if (selectedDuration === 'short' && pkg.duration.days > 4) return false;
-    if (selectedDuration === 'medium' && (pkg.duration.days < 5 || pkg.duration.days > 7)) return false;
-    if (selectedDuration === 'long' && pkg.duration.days < 8) return false;
+    if (selectedDuration.trim()) {
+      const parsedDays = parseInt(selectedDuration, 10);
+      if (!isNaN(parsedDays)) {
+        // Match packages having similar days (±1 day tolerance for flexibility)
+        if (Math.abs(pkg.duration.days - parsedDays) > 1 && pkg.duration.days !== parsedDays) {
+          return false;
+        }
+      } else {
+        if (selectedDuration === 'short' && pkg.duration.days > 4) return false;
+        if (selectedDuration === 'medium' && (pkg.duration.days < 5 || pkg.duration.days > 7)) return false;
+        if (selectedDuration === 'long' && pkg.duration.days < 8) return false;
+      }
+    }
 
     if (selectedBudget === 'budget' && pkg.price > 20000) return false;
     if (selectedBudget === 'mid' && (pkg.price < 20000 || pkg.price > 30000)) return false;

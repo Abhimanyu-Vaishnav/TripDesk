@@ -336,3 +336,22 @@ export async function updateLeadStatus(id: string, status: LeadInquiry['status']
     console.error('Failed to sync lead status to cloud:', err);
   }
 }
+
+export async function deleteLead(id: string) {
+  const leads = getStoredLeads().filter(l => l.id !== id);
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(leads));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  try {
+    await fetch(`/api/leads?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+  } catch (err) {
+    console.error('Failed to delete lead from cloud:', err);
+  }
+}

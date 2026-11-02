@@ -42,6 +42,7 @@ import {
   deletePackage,
   getStoredLeads,
   updateLeadStatus,
+  deleteLead,
   getStoredSettings,
   saveStoredSettings,
   DEFAULT_SETTINGS,
@@ -899,6 +900,7 @@ export default function OwnerDashboardPage() {
                       <th className="py-3 px-4">Destination / Query</th>
                       <th className="py-3 px-4">Details</th>
                       <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4 text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#EADBBA]/60 dark:divide-[#4D2612]">
@@ -957,6 +959,20 @@ export default function OwnerDashboardPage() {
                             <option value="booked">🎉 Booked</option>
                             <option value="cancelled">⚪ Cancelled</option>
                           </select>
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <button
+                            onClick={async () => {
+                              if (confirm(`Are you sure you want to delete lead from ${lead.name || lead.phone}?`)) {
+                                setLeads(prev => prev.filter(l => l.id !== lead.id));
+                                await deleteLead(lead.id);
+                              }
+                            }}
+                            className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors inline-flex items-center"
+                            title="Delete Lead"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}
