@@ -56,6 +56,8 @@ export interface SiteSettings {
   facebookUrl?: string;
   twitterUrl?: string;
   youtubeUrl?: string;
+  linkedinUrl?: string;
+  pinterestUrl?: string;
   responseTimingText?: string;
   copyrightText?: string;
   // Hero & Homepage Customization

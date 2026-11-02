@@ -768,7 +768,7 @@ export default function OwnerDashboardPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
                     Instagram URL
@@ -777,6 +777,59 @@ export default function OwnerDashboardPage() {
                     type="url"
                     value={settings.instagramUrl || ''}
                     onChange={(e) => setSettings({ ...settings, instagramUrl: e.target.value })}
+                    placeholder="https://instagram.com/yourhandle"
+                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                    Facebook Page URL
+                  </label>
+                  <input
+                    type="url"
+                    value={settings.facebookUrl || ''}
+                    onChange={(e) => setSettings({ ...settings, facebookUrl: e.target.value })}
+                    placeholder="https://facebook.com/yourpage"
+                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                    X (Twitter) URL
+                  </label>
+                  <input
+                    type="url"
+                    value={settings.twitterUrl || ''}
+                    onChange={(e) => setSettings({ ...settings, twitterUrl: e.target.value })}
+                    placeholder="https://x.com/yourhandle"
+                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                    LinkedIn Company URL
+                  </label>
+                  <input
+                    type="url"
+                    value={settings.linkedinUrl || ''}
+                    onChange={(e) => setSettings({ ...settings, linkedinUrl: e.target.value })}
+                    placeholder="https://linkedin.com/company/yourcompany"
+                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                    YouTube Channel URL
+                  </label>
+                  <input
+                    type="url"
+                    value={settings.youtubeUrl || ''}
+                    onChange={(e) => setSettings({ ...settings, youtubeUrl: e.target.value })}
+                    placeholder="https://youtube.com/@channel"
                     className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
                   />
                 </div>

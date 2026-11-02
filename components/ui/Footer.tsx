@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Heart, Globe, MessageCircle, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Heart, Globe, MessageCircle, Send, Share2 } from 'lucide-react';
 import Logo from './Logo';
 import { SiteSettings } from '@/types';
 import { getStoredSettings, DEFAULT_SETTINGS, fetchCloudSettings } from '@/lib/storage';
@@ -28,7 +28,7 @@ export default function Footer() {
             <p className="text-sm text-[#FEFAEE]/75 leading-relaxed max-w-sm mt-3">
               {settings.aboutText || DEFAULT_SETTINGS.aboutText}
             </p>
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
               {settings.instagramUrl && (
                 <a
                   href={settings.instagramUrl}
@@ -36,8 +36,57 @@ export default function Footer() {
                   rel="noreferrer"
                   className="w-9 h-9 rounded-full bg-[#FEFAEE]/10 hover:bg-[#DB9309] hover:text-[#351202] text-[#FEFAEE] flex items-center justify-center transition-all duration-300"
                   aria-label="Instagram"
+                  title="Instagram"
                 >
                   <Globe className="w-4 h-4" />
+                </a>
+              )}
+              {settings.facebookUrl && (
+                <a
+                  href={settings.facebookUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-9 h-9 rounded-full bg-[#FEFAEE]/10 hover:bg-[#DB9309] hover:text-[#351202] text-[#FEFAEE] flex items-center justify-center transition-all duration-300 font-bold text-xs"
+                  aria-label="Facebook"
+                  title="Facebook"
+                >
+                  <span>f</span>
+                </a>
+              )}
+              {settings.twitterUrl && (
+                <a
+                  href={settings.twitterUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-9 h-9 rounded-full bg-[#FEFAEE]/10 hover:bg-[#DB9309] hover:text-[#351202] text-[#FEFAEE] flex items-center justify-center transition-all duration-300 font-bold text-xs"
+                  aria-label="X / Twitter"
+                  title="X (Twitter)"
+                >
+                  <span>𝕏</span>
+                </a>
+              )}
+              {settings.linkedinUrl && (
+                <a
+                  href={settings.linkedinUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-9 h-9 rounded-full bg-[#FEFAEE]/10 hover:bg-[#DB9309] hover:text-[#351202] text-[#FEFAEE] flex items-center justify-center transition-all duration-300 font-bold text-xs"
+                  aria-label="LinkedIn"
+                  title="LinkedIn"
+                >
+                  <span>in</span>
+                </a>
+              )}
+              {settings.youtubeUrl && (
+                <a
+                  href={settings.youtubeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-9 h-9 rounded-full bg-[#FEFAEE]/10 hover:bg-[#DB9309] hover:text-[#351202] text-[#FEFAEE] flex items-center justify-center transition-all duration-300"
+                  aria-label="YouTube"
+                  title="YouTube"
+                >
+                  <Share2 className="w-4 h-4" />
                 </a>
               )}
               {settings.whatsappNumber && (
@@ -47,6 +96,7 @@ export default function Footer() {
                   rel="noreferrer"
                   className="w-9 h-9 rounded-full bg-[#FEFAEE]/10 hover:bg-[#DB9309] hover:text-[#351202] text-[#FEFAEE] flex items-center justify-center transition-all duration-300"
                   aria-label="WhatsApp"
+                  title="WhatsApp"
                 >
                   <MessageCircle className="w-4 h-4" />
                 </a>
@@ -56,6 +106,7 @@ export default function Footer() {
                   href={`mailto:${settings.contactEmail}`}
                   className="w-9 h-9 rounded-full bg-[#FEFAEE]/10 hover:bg-[#DB9309] hover:text-[#351202] text-[#FEFAEE] flex items-center justify-center transition-all duration-300"
                   aria-label="Email"
+                  title="Email Us"
                 >
                   <Send className="w-4 h-4" />
                 </a>

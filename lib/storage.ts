@@ -112,6 +112,8 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
           facebookUrl: data.facebook_url || DEFAULT_SETTINGS.facebookUrl,
           twitterUrl: data.twitter_url || DEFAULT_SETTINGS.twitterUrl,
           youtubeUrl: data.youtube_url || DEFAULT_SETTINGS.youtubeUrl,
+          linkedinUrl: data.linkedin_url || '',
+          pinterestUrl: data.pinterest_url || '',
           responseTimingText: data.response_timing_text || DEFAULT_SETTINGS.responseTimingText,
           copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
