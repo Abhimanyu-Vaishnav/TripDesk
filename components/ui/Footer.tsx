@@ -247,7 +247,12 @@ export default function Footer() {
 
         {/* Bottom bar with Verified Links to Privacy Policy, Terms, Sitemap & Staff Portal */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FEFAEE]/70 gap-4">
-          <p>{settings.copyrightText || DEFAULT_SETTINGS.copyrightText} Crafted with <Heart className="w-3.5 h-3.5 inline text-[#DB9309] fill-[#DB9309]" /> for passionate travelers.</p>
+          <p>
+            {settings.copyrightText || DEFAULT_SETTINGS.copyrightText}{' '}
+            • Designed & Built with{' '}
+            <Heart className="w-3.5 h-3.5 inline text-[#DB9309] fill-[#DB9309]" /> by{' '}
+            <span className="font-semibold text-[#FEFAEE] hover:text-[#DB9309] transition-colors">Abhimanyu Vaishnav</span>
+          </p>
           <div className="flex flex-wrap items-center gap-6">
             <Link href="/privacy-policy" className="hover:text-[#DB9309] transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-[#DB9309] transition-colors">Terms of Service</Link>
