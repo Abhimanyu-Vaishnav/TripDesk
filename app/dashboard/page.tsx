@@ -32,7 +32,9 @@ import {
   Image as ImageIcon,
   Video,
   ListPlus,
-  Compass
+  Compass,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import { TourPackage, LeadInquiry, SiteSettings, ItineraryDay } from '@/types';
@@ -71,6 +73,8 @@ export default function OwnerDashboardPage() {
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   const [settingsSavedMessage, setSettingsSavedMessage] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [packagesCurrentPage, setPackagesCurrentPage] = useState(1);
+  const [packagesPerPage, setPackagesPerPage] = useState(10);
   const [leadsFilter, setLeadsFilter] = useState<'all' | 'talk_to_specialist' | 'package_booking'>('all');
 
   // Form modal state
@@ -346,6 +350,13 @@ export default function OwnerDashboardPage() {
     p.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const totalPackagesPages = Math.ceil(filteredPackages.length / packagesPerPage) || 1;
+  const currentSafePackagesPage = Math.min(packagesCurrentPage, totalPackagesPages);
+  const paginatedPackages = filteredPackages.slice(
+    (currentSafePackagesPage - 1) * packagesPerPage,
+    currentSafePackagesPage * packagesPerPage
+  );
+
   const filteredLeads = leads.filter(l => {
     if (leadsFilter === 'talk_to_specialist') return l.type === 'talk_to_specialist';
     if (leadsFilter === 'package_booking') return l.type !== 'talk_to_specialist';
@@ -564,18 +575,41 @@ export default function OwnerDashboardPage() {
                   type="text"
                   placeholder="Search package title, state, or location..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPackagesCurrentPage(1);
+                  }}
                   className="w-full pl-9 pr-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs sm:text-sm text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
                 />
               </div>
 
-              <button
-                onClick={() => handleOpenEditor()}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#DB9309] hover:bg-[#c48107] text-white font-semibold text-xs shadow flex items-center justify-center gap-1.5 transition-all"
-              >
-                <Plus className="w-4 h-4" />
-                Add Package
-              </button>
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                {/* Per Page Selector */}
+                <div className="flex items-center gap-2 text-xs text-[#351202]/70 dark:text-[#FEFAEE]/70">
+                  <span>Show:</span>
+                  <select
+                    value={packagesPerPage}
+                    onChange={(e) => {
+                      setPackagesPerPage(Number(e.target.value));
+                      setPackagesCurrentPage(1);
+                    }}
+                    className="px-2 py-1 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs text-[#351202] dark:text-[#FEFAEE] font-semibold focus:outline-none focus:border-[#DB9309] cursor-pointer"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={() => handleOpenEditor()}
+                  className="px-5 py-2.5 rounded-xl bg-[#DB9309] hover:bg-[#c48107] text-white font-semibold text-xs shadow flex items-center justify-center gap-1.5 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Package
+                </button>
+              </div>
             </div>
 
             <div className="bg-white dark:bg-[#1D1008] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612] overflow-hidden shadow-sm">
@@ -592,16 +626,23 @@ export default function OwnerDashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#EADBBA]/60 dark:divide-[#4D2612]">
-                    {filteredPackages.map((pkg) => (
+                    {paginatedPackages.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-xs text-[#351202]/60 dark:text-[#FEFAEE]/60">
+                          No packages matched your search.
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedPackages.map((pkg) => (
                       <tr key={pkg.id} className="hover:bg-[#FEFAEE]/60 dark:hover:bg-[#120904]/60 transition-colors">
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl overflow-hidden relative shrink-0 border border-[#EADBBA] dark:border-[#4D2612]">
+                            <div className="w-12 h-12 rounded-xl overflow-hidden relative shrink-0 border border-[#EADBBA] dark:border-[#4D2612] bg-black/10 dark:bg-black/40">
                               <img src={pkg.bannerImage} alt={pkg.title} className="w-full h-full object-cover" />
                             </div>
                             <div>
                               <div className="font-semibold text-[#351202] dark:text-[#FEFAEE] line-clamp-1">{pkg.title}</div>
-                              <div className="text-[11px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mt-0.5">{pkg.theme} • {pkg.location}</div>
+                              <div className="text-[11px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mt-0.5">{pkg.theme} • {pkg.location} • {pkg.gallery?.length || 1} photos</div>
                             </div>
                           </div>
                         </td>
@@ -660,9 +701,70 @@ export default function OwnerDashboardPage() {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    ))
+                    )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Complete Pagination Bar */}
+              <div className="p-4 bg-[#FDF7E7] dark:bg-[#120904] border-t border-[#EADBBA] dark:border-[#4D2612] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#351202]/70 dark:text-[#FEFAEE]/70">
+                <div>
+                  Showing{' '}
+                  <span className="font-bold text-[#351202] dark:text-[#FEFAEE]">
+                    {filteredPackages.length === 0
+                      ? 0
+                      : (currentSafePackagesPage - 1) * packagesPerPage + 1}
+                  </span>{' '}
+                  to{' '}
+                  <span className="font-bold text-[#351202] dark:text-[#FEFAEE]">
+                    {Math.min(currentSafePackagesPage * packagesPerPage, filteredPackages.length)}
+                  </span>{' '}
+                  of{' '}
+                  <span className="font-bold text-[#351202] dark:text-[#FEFAEE]">
+                    {filteredPackages.length}
+                  </span>{' '}
+                  packages
+                </div>
+
+                {totalPackagesPages > 1 && (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      disabled={currentSafePackagesPage === 1}
+                      onClick={() => setPackagesCurrentPage(prev => Math.max(prev - 1, 1))}
+                      className="p-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#DB9309] hover:text-white transition-colors"
+                      title="Previous Page"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    {Array.from({ length: totalPackagesPages }, (_, i) => i + 1).map(pageNum => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => setPackagesCurrentPage(pageNum)}
+                        className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                          currentSafePackagesPage === pageNum
+                            ? 'bg-[#DB9309] text-white shadow-sm'
+                            : 'border border-[#EADBBA] dark:border-[#4D2612] text-[#351202] dark:text-[#FEFAEE] hover:bg-[#DB9309]/15'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      disabled={currentSafePackagesPage === totalPackagesPages}
+                      onClick={() => setPackagesCurrentPage(prev => Math.min(prev + 1, totalPackagesPages))}
+                      className="p-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#DB9309] hover:text-white transition-colors"
+                      title="Next Page"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

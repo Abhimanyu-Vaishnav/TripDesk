@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, MapPin, Check, ExternalLink, Play, Star, Sparkles, Shield, Compass } from 'lucide-react';
+import { X, Calendar, MapPin, Check, ExternalLink, Play, Star, Sparkles, Shield, Compass, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import { TourPackage } from '@/types';
 
 interface PackageDetailModalProps {
@@ -31,7 +31,10 @@ export default function PackageDetailModal({
   const hasExclusions = packageData.exclusions && packageData.exclusions.length > 0;
   const hasVideo = Boolean(packageData.videoUrl && packageData.videoUrl.trim());
   const hasOverview = Boolean(packageData.overview && packageData.overview.trim());
-  const galleryImages = (packageData.gallery || []).filter(Boolean);
+  const galleryImages = [
+    packageData.bannerImage,
+    ...(packageData.gallery || []).filter((g) => g && g !== packageData.bannerImage)
+  ].filter(Boolean);
 
   return (
     <AnimatePresence>
@@ -53,14 +56,15 @@ export default function PackageDetailModal({
           transition={{ duration: 0.2 }}
           className="relative w-full max-w-4xl bg-[#FEFAEE] dark:bg-[#1D1008] rounded-3xl shadow-2xl border-2 border-[#DB9309] overflow-hidden z-10 max-h-[90vh] flex flex-col"
         >
-          {/* Header Banner */}
-          <div className="relative h-64 sm:h-72 w-full shrink-0">
-            <Image
-              src={packageData.bannerImage}
-              alt={packageData.title}
-              fill
-              className="object-cover"
-            />
+            {/* Header Banner with unoptimized for external URLs */}
+            <div className="relative h-64 sm:h-72 w-full shrink-0">
+              <Image
+                src={packageData.bannerImage}
+                alt={packageData.title}
+                fill
+                unoptimized
+                className="object-cover"
+              />
             <div className="absolute inset-0 bg-gradient-to-t from-[#351202] dark:from-black via-[#351202]/40 to-transparent" />
 
             {/* Close Button */}
@@ -160,7 +164,7 @@ export default function PackageDetailModal({
                   activeTab === 'gallery' ? 'text-[#351202] dark:text-[#FEFAEE]' : 'text-[#351202]/60 dark:text-[#FEFAEE]/60'
                 }`}
               >
-                Media Gallery & Video
+                Media Gallery ({galleryImages.length})
                 {activeTab === 'gallery' && (
                   <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#DB9309]" />
                 )}
@@ -276,23 +280,30 @@ export default function PackageDetailModal({
 
                 {galleryImages.length > 0 && (
                   <div>
-                    <h5 className="font-serif text-base font-bold text-[#351202] dark:text-[#FEFAEE] mb-3">
-                      Tour Photo Gallery
-                    </h5>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="flex items-center justify-between mb-3">
+                      <h5 className="font-serif text-base font-bold text-[#351202] dark:text-[#FEFAEE]">
+                        Tour Photo Gallery ({galleryImages.length} Photos)
+                      </h5>
+                      <span className="text-xs text-[#351202]/60 dark:text-[#FEFAEE]/60">Click any image to enlarge</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[360px] overflow-y-auto pr-1">
                       {galleryImages.map((img, idx) => (
                         <div
                           key={idx}
                           onClick={() => setSelectedImage(img)}
-                          className="relative h-32 sm:h-40 rounded-xl overflow-hidden border border-[#EADBBA] dark:border-[#4D2612] cursor-pointer group"
+                          className="relative h-28 sm:h-32 rounded-xl overflow-hidden border border-[#EADBBA] dark:border-[#4D2612] cursor-pointer group bg-black/10 dark:bg-black/40"
                         >
                           <Image
                             src={img}
                             alt={`Photo ${idx + 1}`}
                             fill
+                            unoptimized
                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
+                          <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-bold">
+                            #{idx + 1}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -330,6 +341,39 @@ export default function PackageDetailModal({
             </div>
           </div>
         </motion.div>
+
+        {/* Selected Image Fullscreen Preview */}
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-60 bg-black/95 flex flex-col items-center justify-between p-4"
+          >
+            <div className="w-full max-w-5xl flex items-center justify-between text-white py-2">
+              <span className="text-sm font-semibold">{packageData.title}</span>
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-all"
+                aria-label="Close image"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="relative w-full max-w-5xl h-[75vh]">
+              <Image
+                src={selectedImage}
+                alt="Enlarged view"
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+            <div className="py-2 text-xs text-white/60">
+              Click anywhere outside or the X button to close
+            </div>
+          </motion.div>
+        )}
       </div>
     </AnimatePresence>
   );

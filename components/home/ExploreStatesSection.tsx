@@ -123,6 +123,7 @@ export default function ExploreStatesSection({ onSelectState, selectedState }: E
                 src={dest.image}
                 alt={dest.name}
                 fill
+                unoptimized
                 sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />

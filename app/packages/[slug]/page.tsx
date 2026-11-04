@@ -13,6 +13,7 @@ import {
   X,
   Share2,
   ChevronLeft,
+  ChevronRight,
   ShieldCheck,
   Sparkles,
   Compass,
@@ -156,38 +157,130 @@ export default function PackageDetailPage() {
             )}
           </div>
 
-          {/* Interactive Image Gallery Grid (Renders smoothly if multi or single image) */}
+          {/* Interactive Image Gallery Grid (Renders smoothly whether single, 3, 8 or 20+ images) */}
           {allImages.length > 0 && (
-            <div className={`grid gap-4 mb-10 ${allImages.length > 1 ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
-              <div className={`${allImages.length > 1 ? 'lg:col-span-2' : ''} relative h-80 sm:h-[460px] rounded-3xl overflow-hidden shadow-lg border border-[#EADBBA] dark:border-[#4D2612] group`}>
-                <Image
-                  src={allImages[activeImageIndex] || packageData.bannerImage}
-                  alt={packageData.title}
-                  fill
-                  priority
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <button
-                  onClick={() => setLightboxOpen(true)}
-                  className="absolute bottom-4 right-4 px-4 py-2 rounded-xl bg-black/60 hover:bg-black/80 text-white text-xs font-semibold backdrop-blur-md transition-all flex items-center gap-2"
-                >
-                  <span>View Full Screen ({allImages.length} Photos)</span>
-                </button>
+            <div className="space-y-4 mb-10">
+              <div className={`grid gap-4 ${allImages.length > 1 ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                {/* Main Large Active Image Showcase */}
+                <div className={`${allImages.length > 1 ? 'lg:col-span-2' : ''} relative h-80 sm:h-[460px] rounded-3xl overflow-hidden shadow-lg border border-[#EADBBA] dark:border-[#4D2612] group bg-black/10 dark:bg-black/40`}>
+                  <Image
+                    src={allImages[activeImageIndex] || packageData.bannerImage}
+                    alt={`${packageData.title} photo ${activeImageIndex + 1}`}
+                    fill
+                    priority
+                    unoptimized
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  
+                  {/* Photo Counter Badge */}
+                  <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold flex items-center gap-1.5">
+                    <span>{activeImageIndex + 1} / {allImages.length} Photos</span>
+                  </div>
+
+                  {/* Previous / Next Arrows on Large Preview */}
+                  {allImages.length > 1 && (
+                    <div className="absolute inset-y-0 inset-x-2 flex items-center justify-between pointer-events-none">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
+                        }}
+                        className="pointer-events-auto p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-all active:scale-95 shadow-md"
+                        aria-label="Previous photo"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
+                        }}
+                        className="pointer-events-auto p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-all active:scale-95 shadow-md"
+                        aria-label="Next photo"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => setLightboxOpen(true)}
+                    className="absolute bottom-4 right-4 px-4 py-2 rounded-xl bg-black/60 hover:bg-black/80 text-white text-xs font-semibold backdrop-blur-md transition-all flex items-center gap-2 active:scale-95 shadow-md"
+                  >
+                    <span>View Full Screen ({allImages.length} Photos)</span>
+                  </button>
+                </div>
+
+                {/* Right Preview Side Column: shows up to 3 thumbnails or first photos */}
+                {allImages.length > 1 && (
+                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+                    {allImages.slice(1, 4).map((img, idx) => {
+                      const actualIdx = idx + 1;
+                      const isLastSlot = idx === 2 && allImages.length > 4;
+                      return (
+                        <div
+                          key={actualIdx}
+                          onClick={() => {
+                            if (isLastSlot) {
+                              setLightboxOpen(true);
+                            } else {
+                              setActiveImageIndex(actualIdx);
+                            }
+                          }}
+                          className={`relative h-36 lg:h-[142px] rounded-2xl overflow-hidden border-2 cursor-pointer transition-all bg-black/10 dark:bg-black/40 ${
+                            activeImageIndex === actualIdx ? 'border-[#DB9309] shadow-md' : 'border-[#EADBBA] dark:border-[#4D2612] opacity-85 hover:opacity-100'
+                          }`}
+                        >
+                          <Image src={img} alt={`Thumbnail ${actualIdx}`} fill unoptimized className="object-cover" />
+                          {isLastSlot && (
+                            <div className="absolute inset-0 bg-black/65 hover:bg-black/55 backdrop-blur-xs flex flex-col items-center justify-center text-white transition-colors">
+                              <span className="font-serif text-2xl font-bold">+{allImages.length - 4}</span>
+                              <span className="text-[11px] font-medium tracking-wide">More Photos</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
+              {/* Comprehensive Bottom Filmstrip Carousel: Shows ALL images (whether 5, 8, 15, or 25) */}
               {allImages.length > 1 && (
-                <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
-                  {allImages.slice(1, 4).map((img, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => setActiveImageIndex(idx + 1)}
-                      className={`relative h-36 lg:h-[142px] rounded-2xl overflow-hidden border-2 cursor-pointer transition-all ${
-                        activeImageIndex === idx + 1 ? 'border-[#DB9309] shadow-md' : 'border-[#EADBBA] dark:border-[#4D2612] opacity-80 hover:opacity-100'
-                      }`}
+                <div className="bg-[#FDF7E7] dark:bg-[#1D1008] p-3 rounded-2xl border border-[#EADBBA] dark:border-[#4D2612]">
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <span className="text-xs font-bold text-[#351202] dark:text-[#FEFAEE] flex items-center gap-1.5">
+                      <span>📸 All Photo Gallery</span>
+                      <span className="text-[#DB9309]">({allImages.length} images)</span>
+                    </span>
+                    <button
+                      onClick={() => setLightboxOpen(true)}
+                      className="text-xs text-[#DB9309] hover:underline font-semibold"
                     >
-                      <Image src={img} alt={`Thumbnail ${idx}`} fill className="object-cover" />
-                    </div>
-                  ))}
+                      Open Full Screen Gallery
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
+                    {allImages.map((img, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveImageIndex(idx)}
+                        className={`relative w-24 sm:w-28 h-16 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
+                          activeImageIndex === idx
+                            ? 'border-[#DB9309] scale-105 shadow-md ring-2 ring-[#DB9309]/30'
+                            : 'border-[#EADBBA] dark:border-[#4D2612] opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <Image src={img} alt={`Thumb ${idx + 1}`} fill unoptimized className="object-cover" />
+                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-bold">
+                          #{idx + 1}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -428,30 +521,78 @@ export default function PackageDetailPage() {
         </div>
       </main>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal with Full-Screen Next/Prev Arrows */}
       <AnimatePresence>
         {lightboxOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-between p-4"
           >
-            <button
-              onClick={() => setLightboxOpen(false)}
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-all"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <div className="relative w-full max-w-5xl h-[80vh]">
-              <Image
-                src={allImages[activeImageIndex] || packageData.bannerImage}
-                alt="Full preview"
-                fill
-                className="object-contain"
-              />
+            {/* Top Bar: Title & Counter & Close */}
+            <div className="w-full max-w-6xl flex items-center justify-between text-white py-2 z-10">
+              <div>
+                <h4 className="font-serif text-lg font-bold truncate">{packageData.title}</h4>
+                <span className="text-xs text-white/70">Photo {activeImageIndex + 1} of {allImages.length}</span>
+              </div>
+              <button
+                onClick={() => setLightboxOpen(false)}
+                className="p-2.5 rounded-full bg-white/20 hover:bg-white/40 text-white transition-all"
+                aria-label="Close full screen"
+              >
+                <X className="w-6 h-6" />
+              </button>
             </div>
+
+            {/* Main Stage with Big Left/Right controls */}
+            <div className="relative w-full max-w-6xl flex-1 flex items-center justify-center my-2">
+              <div className="relative w-full h-[70vh]">
+                <Image
+                  src={allImages[activeImageIndex] || packageData.bannerImage}
+                  alt={`${packageData.title} photo ${activeImageIndex + 1}`}
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1))}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white backdrop-blur-md transition-all active:scale-95"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0))}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white backdrop-blur-md transition-all active:scale-95"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Bottom Thumbnail Strip */}
+            {allImages.length > 1 && (
+              <div className="w-full max-w-5xl flex items-center justify-center gap-2 overflow-x-auto py-2">
+                {allImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
+                      activeImageIndex === idx ? 'border-[#DB9309] scale-105' : 'border-white/30 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <Image src={img} alt={`Thumb ${idx + 1}`} fill unoptimized className="object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
