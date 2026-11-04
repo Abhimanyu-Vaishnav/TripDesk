@@ -48,6 +48,28 @@ export default function HomePage() {
     });
   }, []);
 
+  // Dynamic list of themes including predefined ones and any custom themes in packages
+  const dynamicThemesList = React.useMemo(() => {
+    const set = new Set<string>(THEMES_LIST);
+    packages.forEach(p => {
+      if (p.theme && p.theme.trim()) {
+        set.add(p.theme.trim());
+      }
+    });
+    return Array.from(set);
+  }, [packages]);
+
+  // Dynamic list of states including all 36 India states/UTs and any custom package states
+  const dynamicStatesList = React.useMemo(() => {
+    const set = new Set<string>(STATES_LIST);
+    packages.forEach(p => {
+      if (p.state && p.state.trim()) {
+        set.add(p.state.trim());
+      }
+    });
+    return Array.from(set);
+  }, [packages]);
+
   const handleHeroSearch = (filters: { state: string; destination: string; budget: string; duration: string }) => {
     setSelectedState(filters.state);
     setSearchQuery(filters.destination);
@@ -147,7 +169,7 @@ export default function HomePage() {
                 onChange={(e) => setSelectedTheme(e.target.value)}
                 className="text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
               >
-                {THEMES_LIST.map((th) => (
+                {dynamicThemesList.map((th) => (
                   <option key={th} value={th}>
                     {th}
                   </option>
@@ -159,7 +181,7 @@ export default function HomePage() {
                 onChange={(e) => setSelectedState(e.target.value)}
                 className="text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
               >
-                {STATES_LIST.map((st) => (
+                {dynamicStatesList.map((st) => (
                   <option key={st} value={st}>
                     {st}
                   </option>

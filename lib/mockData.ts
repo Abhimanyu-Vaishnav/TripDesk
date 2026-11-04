@@ -719,14 +719,44 @@ export const INITIAL_PACKAGES: TourPackage[] = [
 
 export const STATES_LIST = [
   'All States',
-  'Jammu & Kashmir',
-  'Himachal Pradesh',
-  'Rajasthan',
-  'Kerala',
+  // 28 Indian States (Alphabetical)
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
   'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
   'Uttarakhand',
-  'Andaman & Nicobar',
-  'Meghalaya'
+  'West Bengal',
+  // 8 Union Territories
+  'Andaman & Nicobar Islands',
+  'Chandigarh',
+  'Dadra & Nagar Haveli and Daman & Diu',
+  'Delhi (NCR)',
+  'Jammu & Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry'
 ];
 
 export const THEMES_LIST = [
@@ -737,6 +767,12 @@ export const THEMES_LIST = [
   'Nature',
   'Beach',
   'Pilgrimage',
-  'Luxury'
+  'Luxury',
+  'Family Special',
+  'Wildlife & Safari',
+  'Hill Station',
+  'Weekend Getaway',
+  'Road Trip',
+  'Cultural & Festival'
 ];
 

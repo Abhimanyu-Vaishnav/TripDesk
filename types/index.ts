@@ -29,7 +29,7 @@ export interface TourPackage {
   gallery: string[];
   videoUrl?: string; // YouTube embed or video link
   overview: string;
-  theme: 'Honeymoon' | 'Adventure' | 'Heritage' | 'Nature' | 'Beach' | 'Pilgrimage' | 'Luxury';
+  theme: string; // Predefined or custom theme added by admin
   highlights: string[];
   inclusions: string[];
   exclusions: string[];

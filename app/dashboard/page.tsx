@@ -96,7 +96,9 @@ export default function OwnerDashboardPage() {
   const [formHidePrice, setFormHidePrice] = useState(false);
   const [formFeatured, setFormFeatured] = useState(false);
   const [formStatus, setFormStatus] = useState<'active' | 'draft' | 'featured'>('active');
-  const [formTheme, setFormTheme] = useState<TourPackage['theme']>('Adventure');
+  const [formTheme, setFormTheme] = useState<string>('Adventure');
+  const [isCustomTheme, setIsCustomTheme] = useState(false);
+  const [customThemeInput, setCustomThemeInput] = useState('');
   const [formGroupSize, setFormGroupSize] = useState('2 to 12 Persons');
   const [formBestTimeToVisit, setFormBestTimeToVisit] = useState('March to October');
   const [formOverview, setFormOverview] = useState('');
@@ -219,6 +221,14 @@ export default function OwnerDashboardPage() {
       setFormFeatured(Boolean(pkg.featured));
       setFormStatus(pkg.status);
       setFormTheme(pkg.theme);
+      // If the package theme is not in standard THEMES_LIST, enable custom theme mode
+      if (pkg.theme && !THEMES_LIST.includes(pkg.theme)) {
+        setIsCustomTheme(true);
+        setCustomThemeInput(pkg.theme);
+      } else {
+        setIsCustomTheme(false);
+        setCustomThemeInput('');
+      }
       setFormGroupSize(pkg.groupSize || 'Customizable');
       setFormBestTimeToVisit(pkg.bestTimeToVisit || 'Year-round');
       setFormOverview(pkg.overview || '');
@@ -245,6 +255,8 @@ export default function OwnerDashboardPage() {
       setFormFeatured(false);
       setFormStatus('active');
       setFormTheme('Adventure');
+      setIsCustomTheme(false);
+      setCustomThemeInput('');
       setFormGroupSize('2 to 12 Persons');
       setFormBestTimeToVisit('Year-round');
       setFormOverview('');
@@ -274,6 +286,10 @@ export default function OwnerDashboardPage() {
     const cleanExclusions = formExclusions.map(s => s.trim()).filter(Boolean);
     const cleanItinerary = formItinerary.filter(it => it.title.trim() || it.description.trim());
 
+    const finalTheme = isCustomTheme && customThemeInput.trim()
+      ? customThemeInput.trim()
+      : formTheme;
+
     const packageToSave: Partial<TourPackage> & { title: string } = {
       ...(editingPackage?.id ? { id: editingPackage.id } : {}),
       title: formTitle.trim(),
@@ -286,7 +302,7 @@ export default function OwnerDashboardPage() {
       hidePrice: formHidePrice,
       featured: formFeatured,
       status: formStatus,
-      theme: formTheme,
+      theme: finalTheme,
       groupSize: formGroupSize,
       bestTimeToVisit: formBestTimeToVisit,
       overview: formOverview.trim(),
@@ -1386,16 +1402,56 @@ export default function OwnerDashboardPage() {
                       </div>
 
                       <div>
-                        <label className="block font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">Theme</label>
-                        <select
-                          value={formTheme}
-                          onChange={(e) => setFormTheme(e.target.value as any)}
-                          className="w-full px-3 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-[#351202] dark:text-[#FEFAEE]"
-                        >
-                          {THEMES_LIST.filter(t => t !== 'All Themes').map(t => (
-                            <option key={t} value={t}>{t}</option>
-                          ))}
-                        </select>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block font-semibold text-[#351202] dark:text-[#FEFAEE]">Theme *</label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCustomTheme(!isCustomTheme);
+                              if (!isCustomTheme && !customThemeInput) {
+                                setCustomThemeInput(formTheme);
+                              }
+                            }}
+                            className="text-[11px] text-[#DB9309] hover:underline font-semibold"
+                          >
+                            {isCustomTheme ? '← Pick from list' : '+ Custom Theme'}
+                          </button>
+                        </div>
+
+                        {isCustomTheme ? (
+                          <div className="space-y-1">
+                            <input
+                              type="text"
+                              value={customThemeInput}
+                              onChange={(e) => setCustomThemeInput(e.target.value)}
+                              placeholder="e.g. Scuba Diving, Desert Safari, Yoga & Wellness"
+                              className="w-full px-3 py-2.5 rounded-xl border border-[#DB9309] bg-white dark:bg-[#120904] text-[#351202] dark:text-[#FEFAEE] font-medium focus:outline-none focus:ring-1 focus:ring-[#DB9309]"
+                            />
+                            <p className="text-[10px] text-[#351202]/60 dark:text-[#FEFAEE]/60">
+                              Type any custom theme. It will automatically be saved and available in filters.
+                            </p>
+                          </div>
+                        ) : (
+                          <select
+                            value={formTheme}
+                            onChange={(e) => {
+                              if (e.target.value === '__add_custom__') {
+                                setIsCustomTheme(true);
+                                setCustomThemeInput('');
+                              } else {
+                                setFormTheme(e.target.value);
+                              }
+                            }}
+                            className="w-full px-3 py-2.5 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] text-[#351202] dark:text-[#FEFAEE] cursor-pointer"
+                          >
+                            {THEMES_LIST.filter(t => t !== 'All Themes').map(t => (
+                              <option key={t} value={t}>{t}</option>
+                            ))}
+                            <option value="__add_custom__" className="text-[#DB9309] font-bold">
+                              ✨ + Add Custom New Theme...
+                            </option>
+                          </select>
+                        )}
                       </div>
 
                       <div>
