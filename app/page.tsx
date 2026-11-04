@@ -140,10 +140,11 @@ export default function HomePage() {
           headline={settings?.heroTitle}
         />
 
-        {/* Explore States Grid */}
+        {/* Explore States Grid - Dynamically computed from active packages */}
         <ExploreStatesSection
           selectedState={selectedState}
           onSelectState={(st) => setSelectedState(st)}
+          packages={packages}
         />
 
         {/* Packages Section */}

@@ -4,72 +4,157 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { MapPin, ArrowRight } from 'lucide-react';
+import { TourPackage } from '@/types';
 
 interface ExploreStatesSectionProps {
   onSelectState: (state: string) => void;
   selectedState: string;
+  packages?: TourPackage[];
 }
 
-const DESTINATION_CARDS = [
-  {
-    name: 'Kashmir',
-    state: 'Jammu & Kashmir',
-    tag: 'Snow Valleys & Shikaras',
+// Fallback curated imagery & tags for known states
+const DEFAULT_STATE_INFO: Record<string, { tag: string; image: string }> = {
+  'Jammu & Kashmir': {
+    tag: 'Snow Valleys & Dal Lake Shikaras',
     image: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=600&q=80',
-    count: '3 Packages'
   },
-  {
-    name: 'Himachal',
-    state: 'Himachal Pradesh',
+  'Himachal Pradesh': {
     tag: 'Rivers, Pines & Solang Snow',
     image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=600&q=80',
-    count: '4 Packages'
   },
-  {
-    name: 'Rajasthan',
-    state: 'Rajasthan',
+  'Rajasthan': {
     tag: 'Royal Palaces & Desert Havelis',
     image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80',
-    count: '5 Packages'
   },
-  {
-    name: 'Kerala',
-    state: 'Kerala',
+  'Kerala': {
     tag: 'Houseboats & Misty Tea Hills',
     image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=600&q=80',
-    count: '3 Packages'
   },
-  {
-    name: 'Goa',
-    state: 'Goa',
+  'Goa': {
     tag: 'Sunsets, Yachts & Latin Quarters',
     image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80',
-    count: '2 Packages'
   },
-  {
-    name: 'Uttarakhand',
-    state: 'Uttarakhand',
+  'Uttarakhand': {
     tag: 'Ganga Aarti, Rapids & Hills',
     image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80',
-    count: '3 Packages'
   },
-  {
-    name: 'Andaman',
-    state: 'Andaman & Nicobar',
+  'Andaman & Nicobar Islands': {
     tag: 'Coral Reefs & White Sands',
     image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=600&q=80',
-    count: '2 Packages'
   },
-  {
-    name: 'North East',
-    state: 'Meghalaya',
+  'Andaman & Nicobar': {
+    tag: 'Coral Reefs & White Sands',
+    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=600&q=80',
+  },
+  'Meghalaya': {
     tag: 'Living Root Bridges & Waterfalls',
     image: 'https://images.unsplash.com/photo-1627894483216-2138af692e32?auto=format&fit=crop&w=600&q=80',
-    count: '3 Packages'
+  },
+  'Ladakh': {
+    tag: 'High Passes & Turquoise Lakes',
+    image: 'https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80',
+  },
+  'Sikkim': {
+    tag: 'Monasteries & Kanchenjunga Vistas',
+    image: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&q=80',
+  },
+  'Tamil Nadu': {
+    tag: 'Dravidian Temples & French Colonies',
+    image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=600&q=80',
+  },
+  'Karnataka': {
+    tag: 'Coffee Plantations & Hampi Ruins',
+    image: 'https://images.unsplash.com/photo-1600100397608-f010f4438317?auto=format&fit=crop&w=600&q=80',
+  },
+  'Maharashtra': {
+    tag: 'Western Ghats, Caves & Forts',
+    image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=600&q=80',
+  },
+  'Madhya Pradesh': {
+    tag: 'Tiger Safaris & Ancient Heritage',
+    image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=600&q=80',
+  },
+  'Gujarat': {
+    tag: 'White Desert & Asiatic Lions',
+    image: 'https://images.unsplash.com/photo-1609946850119-a1b7a2bb53c6?auto=format&fit=crop&w=600&q=80',
+  },
+  'Delhi (NCR)': {
+    tag: 'Mughal Architecture & Food Capital',
+    image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=600&q=80',
+  },
+  'Uttar Pradesh': {
+    tag: 'Taj Mahal & Sacred Ghats of Varanasi',
+    image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=600&q=80',
+  },
+  'West Bengal': {
+    tag: 'Darjeeling Tea & Cultural Heritage',
+    image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80',
+  },
+  'Assam': {
+    tag: 'One-horned Rhinos & Brahmaputra',
+    image: 'https://images.unsplash.com/photo-1598890777032-bde835ba27c2?auto=format&fit=crop&w=600&q=80',
   }
-];
+};
 
-export default function ExploreStatesSection({ onSelectState, selectedState }: ExploreStatesSectionProps) {
+const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+
+export default function ExploreStatesSection({ onSelectState, selectedState, packages = [] }: ExploreStatesSectionProps) {
+  // Dynamically compute states from available active/featured packages
+  const dynamicStateCards = React.useMemo(() => {
+    const livePackages = packages.filter(p => p.status === 'active' || p.status === 'featured');
+    
+    // Group packages by state
+    const map = new Map<string, { count: number; sampleImage: string; sampleLocation: string }>();
+
+    livePackages.forEach((p) => {
+      if (!p.state) return;
+      const stateName = p.state.trim();
+      const existing = map.get(stateName);
+      if (existing) {
+        existing.count += 1;
+        if (!existing.sampleImage && p.bannerImage) {
+          existing.sampleImage = p.bannerImage;
+        }
+      } else {
+        map.set(stateName, {
+          count: 1,
+          sampleImage: p.bannerImage || '',
+          sampleLocation: p.location || stateName
+        });
+      }
+    });
+
+    // If no packages exist in storage yet, show default popular cards
+    if (map.size === 0) {
+      return [
+        { name: 'Kashmir', state: 'Jammu & Kashmir', tag: 'Snow Valleys & Shikaras', image: DEFAULT_STATE_INFO['Jammu & Kashmir'].image, count: '3 Packages' },
+        { name: 'Himachal', state: 'Himachal Pradesh', tag: 'Rivers, Pines & Solang Snow', image: DEFAULT_STATE_INFO['Himachal Pradesh'].image, count: '4 Packages' },
+        { name: 'Rajasthan', state: 'Rajasthan', tag: 'Royal Palaces & Desert Havelis', image: DEFAULT_STATE_INFO['Rajasthan'].image, count: '5 Packages' },
+        { name: 'Kerala', state: 'Kerala', tag: 'Houseboats & Misty Tea Hills', image: DEFAULT_STATE_INFO['Kerala'].image, count: '3 Packages' },
+        { name: 'Goa', state: 'Goa', tag: 'Sunsets, Yachts & Latin Quarters', image: DEFAULT_STATE_INFO['Goa'].image, count: '2 Packages' },
+        { name: 'Uttarakhand', state: 'Uttarakhand', tag: 'Ganga Aarti, Rapids & Hills', image: DEFAULT_STATE_INFO['Uttarakhand'].image, count: '3 Packages' },
+        { name: 'Andaman', state: 'Andaman & Nicobar Islands', tag: 'Coral Reefs & White Sands', image: DEFAULT_STATE_INFO['Andaman & Nicobar Islands'].image, count: '2 Packages' },
+        { name: 'North East', state: 'Meghalaya', tag: 'Living Root Bridges & Waterfalls', image: DEFAULT_STATE_INFO['Meghalaya'].image, count: '3 Packages' }
+      ];
+    }
+
+    // Convert map to list of cards
+    return Array.from(map.entries()).map(([stateName, info]) => {
+      const predefined = DEFAULT_STATE_INFO[stateName];
+      const image = info.sampleImage || (predefined ? predefined.image : DEFAULT_FALLBACK_IMAGE);
+      const tag = predefined ? predefined.tag : `Explore ${info.sampleLocation}`;
+      const shortName = stateName.replace(' Islands', '').replace(' (NCR)', '');
+
+      return {
+        name: shortName,
+        state: stateName,
+        tag,
+        image,
+        count: `${info.count} ${info.count === 1 ? 'Package' : 'Packages'}`
+      };
+    });
+  }, [packages]);
+
   return (
     <section id="destinations" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Header */}
@@ -82,7 +167,7 @@ export default function ExploreStatesSection({ onSelectState, selectedState }: E
             Explore by States & Regions
           </h2>
           <p className="text-sm text-[#351202]/70 dark:text-[#FEFAEE]/70 mt-2 max-w-xl">
-            From the snow-crowned Himalayas of Kashmir to the tropical backwaters of Kerala, pick your dream state for tailor-made itineraries.
+            From the snow-crowned Himalayas to tropical backwaters, pick your dream state for tailor-made itineraries.
           </p>
         </div>
 
@@ -98,12 +183,12 @@ export default function ExploreStatesSection({ onSelectState, selectedState }: E
 
       {/* Grid of State Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {DESTINATION_CARDS.map((dest, idx) => {
-          const isSelected = selectedState === dest.state;
+        {dynamicStateCards.map((dest, idx) => {
+          const isSelected = selectedState.toLowerCase() === dest.state.toLowerCase();
 
           return (
             <motion.div
-              key={dest.name}
+              key={dest.state}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
