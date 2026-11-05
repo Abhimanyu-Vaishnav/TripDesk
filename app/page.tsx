@@ -13,7 +13,7 @@ import InquiryForm from '@/components/contact/InquiryForm';
 import { TourPackage, SiteSettings } from '@/types';
 import { getStoredPackages, getStoredSettings, fetchCloudPackages, fetchCloudSettings } from '@/lib/storage';
 import { THEMES_LIST, STATES_LIST } from '@/lib/mockData';
-import { Sparkles, Search } from 'lucide-react';
+import { Sparkles, Search, ArrowUpDown, ChevronDown, Loader2 } from 'lucide-react';
 
 export default function HomePage() {
   const [packages, setPackages] = useState<TourPackage[]>([]);
@@ -24,6 +24,12 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
   const [selectedBudget, setSelectedBudget] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('featured'); // 'featured' | 'price_asc' | 'price_desc' | 'days_asc' | 'days_desc' | 'rating'
+  
+  // Pagination / Load More state (12 per batch)
+  const INITIAL_BATCH_SIZE = 12;
+  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_BATCH_SIZE);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   // Modal & Enquiry state
   const [activeModalPackage, setActiveModalPackage] = useState<TourPackage | null>(null);
@@ -128,6 +134,49 @@ export default function HomePage() {
     return true;
   });
 
+  // Sort logic
+  const sortedPackages = React.useMemo(() => {
+    const list = [...filteredPackages];
+    switch (sortBy) {
+      case 'price_asc':
+        return list.sort((a, b) => a.price - b.price);
+      case 'price_desc':
+        return list.sort((a, b) => b.price - a.price);
+      case 'days_asc':
+        return list.sort((a, b) => a.duration.days - b.duration.days);
+      case 'days_desc':
+        return list.sort((a, b) => b.duration.days - a.duration.days);
+      case 'rating':
+        return list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      case 'featured':
+      default:
+        // Featured packages first, then by rating
+        return list.sort((a, b) => {
+          if (a.featured === b.featured) {
+            return (b.rating || 0) - (a.rating || 0);
+          }
+          return a.featured ? -1 : 1;
+        });
+    }
+  }, [filteredPackages, sortBy]);
+
+  // Packages to display based on visibleCount
+  const displayedPackages = sortedPackages.slice(0, visibleCount);
+  const hasMore = visibleCount < sortedPackages.length;
+
+  const handleLoadMore = () => {
+    setIsLoadingMore(true);
+    setTimeout(() => {
+      setVisibleCount((prev) => prev + INITIAL_BATCH_SIZE);
+      setIsLoadingMore(false);
+    }, 450); // Delightful smooth loading experience
+  };
+
+  // Reset pagination when search or filters change
+  useEffect(() => {
+    setVisibleCount(INITIAL_BATCH_SIZE);
+  }, [selectedState, selectedTheme, searchQuery, selectedDuration, selectedBudget, sortBy]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FEFAEE] dark:bg-[#120904]">
       <Navbar />
@@ -163,15 +212,32 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Quick Filter Bar */}
+            {/* Quick Filter & Sort Bar */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-[#FDF7E7] dark:bg-[#1D1008] p-2 rounded-2xl border border-[#EADBBA] dark:border-[#4D2612]">
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-xs font-semibold text-[#351202] dark:text-[#FEFAEE]">
+                <ArrowUpDown className="w-3.5 h-3.5 text-[#DB9309]" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-transparent text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] focus:outline-none cursor-pointer pr-1"
+                >
+                  <option value="featured" className="bg-white dark:bg-[#120904]">Featured First</option>
+                  <option value="price_asc" className="bg-white dark:bg-[#120904]">Price: Low to High</option>
+                  <option value="price_desc" className="bg-white dark:bg-[#120904]">Price: High to Low</option>
+                  <option value="days_asc" className="bg-white dark:bg-[#120904]">Duration: Short to Long</option>
+                  <option value="days_desc" className="bg-white dark:bg-[#120904]">Duration: Long to Short</option>
+                  <option value="rating" className="bg-white dark:bg-[#120904]">Highest Rated</option>
+                </select>
+              </div>
+
               <select
                 value={selectedTheme}
                 onChange={(e) => setSelectedTheme(e.target.value)}
                 className="text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
               >
                 {dynamicThemesList.map((th) => (
-                  <option key={th} value={th}>
+                  <option key={th} value={th} className="bg-white dark:bg-[#120904]">
                     {th}
                   </option>
                 ))}
@@ -183,18 +249,19 @@ export default function HomePage() {
                 className="text-xs font-semibold px-3 py-2 rounded-xl bg-white dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
               >
                 {dynamicStatesList.map((st) => (
-                  <option key={st} value={st}>
+                  <option key={st} value={st} className="bg-white dark:bg-[#120904]">
                     {st}
                   </option>
                 ))}
               </select>
 
-              {(selectedState !== 'All States' || selectedTheme !== 'All Themes' || searchQuery) && (
+              {(selectedState !== 'All States' || selectedTheme !== 'All Themes' || searchQuery || sortBy !== 'featured') && (
                 <button
                   onClick={() => {
                     setSelectedState('All States');
                     setSelectedTheme('All Themes');
                     setSearchQuery('');
+                    setSortBy('featured');
                   }}
                   className="text-xs px-2.5 py-1.5 text-[#DB9309] hover:underline font-medium"
                 >
@@ -206,24 +273,54 @@ export default function HomePage() {
 
           {/* Results count & status */}
           <div className="flex items-center justify-between text-xs text-[#351202]/60 dark:text-[#FEFAEE]/60 mb-6 pb-3 border-b border-[#EADBBA]/60 dark:border-[#4D2612]">
-            <span>Showing {filteredPackages.length} packages across India</span>
+            <span>
+              Showing {displayedPackages.length} of {sortedPackages.length} packages across India
+            </span>
             {selectedState !== 'All States' && (
               <span className="font-medium text-[#351202] dark:text-[#FEFAEE]">Filtered by {selectedState}</span>
             )}
           </div>
 
           {/* Package Cards Grid */}
-          {filteredPackages.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPackages.map((pkg) => (
-                <PackageCard
-                  key={pkg.id}
-                  packageData={pkg}
-                  hideAllPrices={settings?.hideAllPrices}
-                  onQuickView={(p) => setActiveModalPackage(p)}
-                />
-              ))}
-            </div>
+          {displayedPackages.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {displayedPackages.map((pkg) => (
+                  <PackageCard
+                    key={pkg.id}
+                    packageData={pkg}
+                    hideAllPrices={settings?.hideAllPrices}
+                    onQuickView={(p) => setActiveModalPackage(p)}
+                  />
+                ))}
+              </div>
+
+              {/* Load More Button with Smooth Animated Spinner */}
+              {hasMore && (
+                <div className="mt-12 text-center flex flex-col items-center justify-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={isLoadingMore}
+                    className="group relative inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full font-semibold text-sm text-[#351202] dark:text-[#FEFAEE] bg-[#FDF7E7] dark:bg-[#1D1008] border-2 border-[#DB9309]/50 hover:border-[#DB9309] shadow-sm hover:shadow-lg transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    {isLoadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 text-[#DB9309] animate-spin" />
+                        <span>Curating More Packages...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Load More Handcrafted Packages</span>
+                        <ChevronDown className="w-4 h-4 text-[#DB9309] group-hover:translate-y-0.5 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-[#351202]/50 dark:text-[#FEFAEE]/50 mt-2">
+                    {sortedPackages.length - displayedPackages.length} more itineraries available
+                  </p>
+                </div>
+              )}
+            </>
           ) : (
             <div className="py-20 text-center bg-[#FDF7E7] dark:bg-[#1D1008] rounded-3xl border border-[#EADBBA] dark:border-[#4D2612] p-8">
               <Search className="w-12 h-12 text-[#DB9309] mx-auto mb-3" />
