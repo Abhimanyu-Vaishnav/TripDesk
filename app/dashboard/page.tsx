@@ -48,6 +48,7 @@ import {
   getStoredSettings,
   saveStoredSettings,
   DEFAULT_SETTINGS,
+  normalizeImageUrl,
   fetchCloudPackages,
   fetchCloudSettings,
   fetchCloudLeads
@@ -1094,20 +1095,29 @@ export default function OwnerDashboardPage() {
                 </label>
                 {(settings.heroSlides || []).map((slide, idx) => (
                   <div key={idx} className="p-3 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612] flex flex-col sm:flex-row items-center gap-3">
-                    <div className="relative w-20 h-14 rounded-lg overflow-hidden bg-black/10 shrink-0">
-                      <img src={slide.url} alt={slide.title} className="w-full h-full object-cover" />
+                    <div className="relative w-20 h-14 rounded-lg overflow-hidden bg-black/10 shrink-0 border border-[#EADBBA] dark:border-[#4D2612]">
+                      <img 
+                        src={normalizeImageUrl(slide.url)} 
+                        alt={slide.title} 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => {
+                          // Fallback if image fails
+                          (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+                        }}
+                      />
                     </div>
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                       <input
                         type="url"
                         value={slide.url}
                         onChange={(e) => {
+                          const converted = normalizeImageUrl(e.target.value);
                           const updated = [...(settings.heroSlides || [])];
-                          updated[idx] = { ...updated[idx], url: e.target.value };
+                          updated[idx] = { ...updated[idx], url: converted };
                           setSettings({ ...settings, heroSlides: updated });
                         }}
-                        placeholder="Image URL (Unsplash or direct image link)"
-                        className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs"
+                        placeholder="Image URL (Unsplash, Google Drive share link, etc.)"
+                        className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs font-mono"
                       />
                       <input
                         type="text"
@@ -1589,19 +1599,40 @@ export default function OwnerDashboardPage() {
                 {editorSection === 'media' && (
                   <div className="space-y-5">
                     <div>
-                      <label className="block font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
-                        Primary Banner Image URL * (Unsplash, Google Drive, or any image link)
-                      </label>
-                      <input
-                        type="url"
-                        required
-                        value={formBannerImage}
-                        onChange={(e) => setFormBannerImage(e.target.value)}
-                        placeholder="https://images.unsplash.com/... or Google Drive share link"
-                        className="w-full px-3.5 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904]"
-                      />
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block font-semibold text-[#351202] dark:text-[#FEFAEE]">
+                          Primary Banner Image URL * (Unsplash, Google Drive, or any image link)
+                        </label>
+                        {formBannerImage && (
+                          <span className="text-[11px] text-[#DB9309] font-medium">
+                            Preview below
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex gap-3 items-center">
+                        {formBannerImage && (
+                          <div className="w-16 h-12 rounded-xl overflow-hidden shrink-0 border border-[#DB9309] bg-black/10">
+                            <img
+                              src={normalizeImageUrl(formBannerImage)}
+                              alt="Banner preview"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+                              }}
+                            />
+                          </div>
+                        )}
+                        <input
+                          type="url"
+                          required
+                          value={formBannerImage}
+                          onChange={(e) => setFormBannerImage(normalizeImageUrl(e.target.value))}
+                          placeholder="https://images.unsplash.com/... or Google Drive share link"
+                          className="w-full px-3.5 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] font-mono text-xs"
+                        />
+                      </div>
                       <p className="text-[10px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mt-1">
-                        💡 Google Drive image links (anyone with the link can view) are automatically converted into direct live display images!
+                        💡 Google Drive share links (`drive.google.com/file/d/...`) are automatically converted in real-time to direct HD image links!
                       </p>
                     </div>
 
@@ -1642,16 +1673,28 @@ export default function OwnerDashboardPage() {
                       {formGalleryImages.map((img, idx) => (
                         <div key={idx} className="flex items-center gap-2">
                           <span className="text-xs font-bold text-[#DB9309] w-6 shrink-0">#{idx + 1}</span>
+                          {img && (
+                            <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-[#EADBBA] dark:border-[#4D2612] bg-black/10">
+                              <img
+                                src={normalizeImageUrl(img)}
+                                alt={`Thumb ${idx + 1}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+                                }}
+                              />
+                            </div>
+                          )}
                           <input
                             type="url"
                             value={img}
                             onChange={(e) => {
                               const updated = [...formGalleryImages];
-                              updated[idx] = e.target.value;
+                              updated[idx] = normalizeImageUrl(e.target.value);
                               setFormGalleryImages(updated);
                             }}
-                            placeholder="https://images.unsplash.com/..."
-                            className="w-full px-3 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904]"
+                            placeholder="https://images.unsplash.com/... or Google Drive link"
+                            className="w-full px-3 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904] font-mono text-xs"
                           />
                           {formGalleryImages.length > 1 && (
                             <button
