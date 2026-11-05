@@ -215,12 +215,12 @@ export default function ExploreStatesSection({ onSelectState, selectedState, pac
 
               <div className="absolute inset-0 bg-gradient-to-t from-[#351202] dark:from-black via-[#351202]/30 dark:via-black/40 to-black/20 group-hover:from-[#351202]/95 transition-colors" />
 
-              <div className="absolute inset-0 p-4 sm:p-5 flex flex-col justify-between text-white">
+              <div className="absolute inset-0 p-4 sm:p-5 flex flex-col justify-between text-[#FEFAEE]">
                 <div className="flex justify-between items-start">
-                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md">
+                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#FEFAEE]/20 text-[#FEFAEE] backdrop-blur-md border border-[#FEFAEE]/15">
                     {dest.count}
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-[#FEFAEE]/20 backdrop-blur-md flex items-center justify-center group-hover:bg-[#DB9309] group-hover:text-[#351202] transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-[#FEFAEE]/20 backdrop-blur-md flex items-center justify-center group-hover:bg-[#DB9309] group-hover:text-[#351202] text-[#FEFAEE] transition-colors border border-[#FEFAEE]/15">
                     <ArrowRight className="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </div>
@@ -230,10 +230,10 @@ export default function ExploreStatesSection({ onSelectState, selectedState, pac
                     <MapPin className="w-3 h-3" />
                     <span>{dest.state}</span>
                   </div>
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold leading-tight">
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold leading-tight text-[#FEFAEE]">
                     {dest.name}
                   </h3>
-                  <p className="text-xs text-white/80 mt-1 line-clamp-1">
+                  <p className="text-xs text-[#FEFAEE]/85 mt-1 line-clamp-1">
                     {dest.tag}
                   </p>
                 </div>

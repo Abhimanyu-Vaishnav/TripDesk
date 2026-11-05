@@ -494,7 +494,7 @@ export default function PackageDetailPage() {
                   </a>
 
                   <a
-                    href={`https://wa.me/919876543210?text=Hi%20TripDesk,%20I%20am%20interested%20in%20${encodeURIComponent(packageData.title)}`}
+                    href={`https://wa.me/${(settings?.contactPhone || settings?.whatsappNumber || '919876543210').replace(/[^0-9]/g, '')}?text=Hi%20TripDesk,%20I%20am%20interested%20in%20${encodeURIComponent(packageData.title)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs transition-colors flex items-center justify-center gap-2"

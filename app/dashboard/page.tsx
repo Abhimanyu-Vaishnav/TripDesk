@@ -844,21 +844,31 @@ export default function OwnerDashboardPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
-                    Primary Phone Number *
+                    Primary Phone Number (Used for Calls & WhatsApp) *
                   </label>
                   <input
                     type="text"
                     required
                     value={settings.contactPhone}
-                    onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSettings({ 
+                        ...settings, 
+                        contactPhone: val,
+                        whatsappNumber: val // Sync WhatsApp with primary number automatically
+                      });
+                    }}
                     placeholder="+91 98765 43210"
-                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
+                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs font-medium"
                   />
+                  <p className="text-[10px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mt-1">
+                    This primary number will be used across the site for Priority Callbacks and Direct WhatsApp chats.
+                  </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
-                    Secondary / Landline Number
+                    Secondary / Landline Number (Optional)
                   </label>
                   <input
                     type="text"
@@ -867,6 +877,9 @@ export default function OwnerDashboardPage() {
                     placeholder="+91 11 4567 8900"
                     className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
                   />
+                  <p className="text-[10px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mt-1">
+                    Additional office or landline contact number shown in footer.
+                  </p>
                 </div>
 
                 <div>
@@ -885,7 +898,7 @@ export default function OwnerDashboardPage() {
 
                 <div>
                   <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
-                    WhatsApp Number (for direct chat) *
+                    WhatsApp Dedicated Chat Link / Number *
                   </label>
                   <input
                     type="text"
@@ -893,8 +906,11 @@ export default function OwnerDashboardPage() {
                     value={settings.whatsappNumber}
                     onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                     placeholder="+919876543210"
-                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs"
+                    className="w-full px-4 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs font-medium"
                   />
+                  <p className="text-[10px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mt-1">
+                    Defaulted to Primary phone number. Can be adjusted if a separate WhatsApp business number is used.
+                  </p>
                 </div>
               </div>
 
@@ -1574,16 +1590,19 @@ export default function OwnerDashboardPage() {
                   <div className="space-y-5">
                     <div>
                       <label className="block font-semibold text-[#351202] dark:text-[#FEFAEE] mb-1">
-                        Primary Banner Image URL *
+                        Primary Banner Image URL * (Unsplash, Google Drive, or any image link)
                       </label>
                       <input
                         type="url"
                         required
                         value={formBannerImage}
                         onChange={(e) => setFormBannerImage(e.target.value)}
-                        placeholder="https://images.unsplash.com/photo-..."
+                        placeholder="https://images.unsplash.com/... or Google Drive share link"
                         className="w-full px-3.5 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#120904]"
                       />
+                      <p className="text-[10px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mt-1">
+                        💡 Google Drive image links (anyone with the link can view) are automatically converted into direct live display images!
+                      </p>
                     </div>
 
                     {/* YouTube Embed Video URL */}

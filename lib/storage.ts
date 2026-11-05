@@ -2,6 +2,28 @@ import { TourPackage, LeadInquiry, SiteSettings } from '@/types';
 import { INITIAL_PACKAGES } from './mockData';
 import { supabase, isSupabaseConfigured } from './supabase';
 
+/**
+ * Normalizes image URLs from Google Drive or other sources to direct image embeds.
+ * Converts Google Drive sharing links (drive.google.com/file/d/...) to direct lh3.googleusercontent.com links.
+ */
+export function normalizeImageUrl(url: string): string {
+  if (!url || typeof url !== 'string') return url || '';
+  const trimmed = url.trim();
+
+  // Match Google Drive share / preview / file links:
+  // e.g. https://drive.google.com/file/d/1VfVeVLL-ahhlZVnU64JjHkZoGtaOyaaK/view?usp=sharing
+  // or https://drive.google.com/open?id=1VfVeVLL-ahhlZVnU64JjHkZoGtaOyaaK
+  // or https://drive.google.com/uc?id=1VfVeVLL-ahhlZVnU64JjHkZoGtaOyaaK
+  const driveMatch = trimmed.match(
+    /(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=view&)?id=)|docs\.google\.com\/file\/d\/)([a-zA-Z0-9_-]+)/
+  );
+  if (driveMatch && driveMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+  }
+
+  return trimmed;
+}
+
 const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v3';
 const LEADS_STORAGE_KEY = 'tripdesk_leads_v3';
 const SETTINGS_STORAGE_KEY = 'tripdesk_settings_v3';
@@ -130,10 +152,21 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
 }
 
 export async function saveStoredSettings(settings: SiteSettings) {
-  memorySettings = settings;
+  // Normalize Google Drive links in hero slides if present
+  const cleanedHeroSlides = (settings.heroSlides || []).map(s => ({
+    ...s,
+    url: normalizeImageUrl(s.url)
+  }));
+
+  const cleanedSettings: SiteSettings = {
+    ...settings,
+    heroSlides: cleanedHeroSlides
+  };
+
+  memorySettings = cleanedSettings;
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(cleanedSettings));
     } catch (e) {
       console.error(e);
     }
@@ -144,27 +177,27 @@ export async function saveStoredSettings(settings: SiteSettings) {
     try {
       await supabase.from('site_settings').upsert({
         id: 'primary_settings',
-        hide_all_prices: settings.hideAllPrices,
-        contact_mode: settings.contactMode,
-        google_form_embed_url: settings.googleFormEmbedUrl,
-        company_name: settings.companyName,
-        tagline: settings.tagline,
-        about_text: settings.aboutText,
-        contact_address: settings.contactAddress,
-        contact_email: settings.contactEmail,
-        contact_phone: settings.contactPhone,
-        contact_landline: settings.contactLandline,
-        whatsapp_number: settings.whatsappNumber,
-        instagram_url: settings.instagramUrl,
-        facebook_url: settings.facebookUrl,
-        twitter_url: settings.twitterUrl,
-        youtube_url: settings.youtubeUrl,
-        linkedin_url: settings.linkedinUrl,
-        pinterest_url: settings.pinterestUrl,
-        response_timing_text: settings.responseTimingText,
-        copyright_text: settings.copyrightText,
-        hero_title: settings.heroTitle,
-        hero_slides: settings.heroSlides,
+        hide_all_prices: cleanedSettings.hideAllPrices,
+        contact_mode: cleanedSettings.contactMode,
+        google_form_embed_url: cleanedSettings.googleFormEmbedUrl,
+        company_name: cleanedSettings.companyName,
+        tagline: cleanedSettings.tagline,
+        about_text: cleanedSettings.aboutText,
+        contact_address: cleanedSettings.contactAddress,
+        contact_email: cleanedSettings.contactEmail,
+        contact_phone: cleanedSettings.contactPhone,
+        contact_landline: cleanedSettings.contactLandline,
+        whatsapp_number: cleanedSettings.whatsappNumber,
+        instagram_url: cleanedSettings.instagramUrl,
+        facebook_url: cleanedSettings.facebookUrl,
+        twitter_url: cleanedSettings.twitterUrl,
+        youtube_url: cleanedSettings.youtubeUrl,
+        linkedin_url: cleanedSettings.linkedinUrl,
+        pinterest_url: cleanedSettings.pinterestUrl,
+        response_timing_text: cleanedSettings.responseTimingText,
+        copyright_text: cleanedSettings.copyrightText,
+        hero_title: cleanedSettings.heroTitle,
+        hero_slides: cleanedSettings.heroSlides,
         updated_at: new Date().toISOString()
       });
     } catch (dbErr) {
@@ -177,7 +210,7 @@ export async function saveStoredSettings(settings: SiteSettings) {
     await fetch('/api/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settings)
+      body: JSON.stringify(cleanedSettings)
     });
   } catch (err) {
     console.error('Settings API save failed:', err);
@@ -238,6 +271,13 @@ export async function savePackage(pkg: Partial<TourPackage> & { title: string })
   const id = pkg.id || `td-${Date.now()}`;
   const slug = pkg.slug || pkg.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   
+  const rawBanner = normalizeImageUrl(pkg.bannerImage || '');
+  const bannerImage = rawBanner || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80';
+
+  const rawGallery = pkg.gallery && pkg.gallery.length 
+    ? pkg.gallery.filter(Boolean).map(normalizeImageUrl) 
+    : [bannerImage];
+
   const fullPkg: TourPackage = {
     id,
     slug,
@@ -253,8 +293,8 @@ export async function savePackage(pkg: Partial<TourPackage> & { title: string })
     status: pkg.status || 'active',
     rating: pkg.rating || 4.9,
     reviewsCount: pkg.reviewsCount || 1,
-    bannerImage: pkg.bannerImage || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-    gallery: pkg.gallery && pkg.gallery.length ? pkg.gallery.filter(Boolean) : [pkg.bannerImage || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'],
+    bannerImage,
+    gallery: rawGallery.length ? rawGallery : [bannerImage],
     videoUrl: pkg.videoUrl ? pkg.videoUrl.trim() : '',
     overview: pkg.overview ? pkg.overview.trim() : '',
     theme: pkg.theme || 'Nature',

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { DEFAULT_SETTINGS } from '@/lib/storage';
+import { DEFAULT_SETTINGS, normalizeImageUrl } from '@/lib/storage';
 import { SiteSettings } from '@/types';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +8,11 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   try {
     const body: SiteSettings = await request.json();
-    const settings = { ...DEFAULT_SETTINGS, ...body };
+    const heroSlides = (body.heroSlides || []).map(s => ({
+      ...s,
+      url: normalizeImageUrl(s.url)
+    }));
+    const settings = { ...DEFAULT_SETTINGS, ...body, heroSlides };
 
     if (!isSupabaseConfigured || !supabase) {
       return NextResponse.json({ success: false, reason: 'Supabase client not initialized' }, { status: 500 });

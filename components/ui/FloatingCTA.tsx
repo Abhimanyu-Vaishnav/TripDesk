@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, User, Phone, CheckCircle2 } from 'lucide-react';
-import { saveLead } from '@/lib/storage';
+import { saveLead, getStoredSettings, fetchCloudSettings, DEFAULT_SETTINGS } from '@/lib/storage';
+import { SiteSettings } from '@/types';
 
 export default function FloatingCTA() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,17 @@ export default function FloatingCTA() {
   const [quickPhone, setQuickPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    setSettings(getStoredSettings());
+    fetchCloudSettings().then(s => {
+      if (s) setSettings(s);
+    });
+  }, []);
+
+  // WhatsApp number priority: Primary Phone Number first (contactPhone), fallback to whatsappNumber
+  const activeWhatsAppNumber = (settings.contactPhone || settings.whatsappNumber || DEFAULT_SETTINGS.contactPhone || '').replace(/[^0-9]/g, '');
 
   const handleQuickCallback = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,10 +131,10 @@ export default function FloatingCTA() {
 
               <div className="mt-3 pt-3 border-t border-[#EADBBA]/60 dark:border-[#4D2612] flex items-center justify-between">
                 <a
-                  href="https://wa.me/919876543210?text=Hi%20TripDesk%20Holidays,%20I%20am%20looking%20to%20plan%20a%20tour%20package."
+                  href={`https://wa.me/${activeWhatsAppNumber}?text=Hi%20TripDesk%20Holidays,%20I%20am%20looking%20to%20plan%20a%20tour%20package.`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors shadow-sm"
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm"
                 >
                   <MessageCircle className="w-4 h-4 fill-white text-emerald-600" />
                   Direct WhatsApp Chat

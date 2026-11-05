@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { INITIAL_PACKAGES } from '@/lib/mockData';
 import { TourPackage } from '@/types';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { normalizeImageUrl } from '@/lib/storage';
 
 let serverPackages: TourPackage[] = [...INITIAL_PACKAGES];
 
@@ -91,10 +92,15 @@ export async function POST(request: Request) {
     const id = pkg.id || `td-${Date.now()}`;
     const slug = pkg.slug || pkg.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+    const bannerImage = normalizeImageUrl(pkg.bannerImage || '');
+    const gallery = (pkg.gallery || []).map(normalizeImageUrl);
+
     const newPackage: TourPackage = {
       ...pkg,
       id,
       slug,
+      bannerImage,
+      gallery,
       rating: pkg.rating || 4.9,
       reviewsCount: pkg.reviewsCount || 1,
       status: pkg.status || 'active',

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { DEFAULT_SETTINGS } from '@/lib/storage';
+import { DEFAULT_SETTINGS, normalizeImageUrl } from '@/lib/storage';
 import { SiteSettings } from '@/types';
 
 // Force dynamic execution (never cache GET requests on edge/server)
@@ -58,7 +58,16 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body: SiteSettings = await request.json();
-    cachedSettings = { ...DEFAULT_SETTINGS, ...body };
+    const heroSlides = (body.heroSlides || []).map(s => ({
+      ...s,
+      url: normalizeImageUrl(s.url)
+    }));
+
+    cachedSettings = {
+      ...DEFAULT_SETTINGS,
+      ...body,
+      heroSlides
+    };
 
     let dbError = null;
 
