@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { INITIAL_PACKAGES } from '@/lib/mockData';
 import { TourPackage } from '@/types';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { normalizeImageUrl } from '@/lib/storage';
+import { normalizeImageUrl, generateRealisticRating } from '@/lib/storage';
 
 let serverPackages: TourPackage[] = [...INITIAL_PACKAGES];
 
@@ -15,35 +15,46 @@ export async function GET() {
         .order('created_at', { ascending: false });
 
       if (!error && data && data.length > 0) {
-        serverPackages = data.map(item => ({
-          id: item.id,
-          slug: item.slug,
-          title: item.title,
-          tagline: item.tagline || '',
-          state: item.state,
-          location: item.location,
-          duration: item.duration || { days: 5, nights: 4 },
-          price: Number(item.price) || 0,
-          originalPrice: item.original_price ? Number(item.original_price) : undefined,
-          hidePrice: Boolean(item.hide_price),
-          featured: Boolean(item.featured),
-          status: item.status || 'active',
-          rating: Number(item.rating) || 4.9,
-          reviewsCount: Number(item.reviews_count) || 1,
-          bannerImage: item.banner_image,
-          gallery: item.gallery || [],
-          videoUrl: item.video_url || '',
-          overview: item.overview || '',
-          theme: item.theme || 'Nature',
-          highlights: item.highlights || [],
-          inclusions: item.inclusions || [],
-          exclusions: item.exclusions || [],
-          itinerary: item.itinerary || [],
-          groupSize: item.group_size || 'Customizable',
-          bestTimeToVisit: item.best_time_to_visit || 'Year-round',
-          createdAt: item.created_at,
-          updatedAt: item.updated_at
-        }));
+        serverPackages = data.map(item => {
+          const rawRating = Number(item.rating);
+          const rawReviews = Number(item.reviews_count);
+          // If rating in DB was default 1 or reviews_count was 1, generate a realistic 4.7-5.0 rating & reviews
+          const { rating, reviewsCount } = generateRealisticRating(
+            item.id,
+            rawRating >= 4.7 && rawRating <= 5.0 ? rawRating : undefined,
+            rawReviews > 1 ? rawReviews : undefined
+          );
+
+          return {
+            id: item.id,
+            slug: item.slug,
+            title: item.title,
+            tagline: item.tagline || '',
+            state: item.state,
+            location: item.location,
+            duration: item.duration || { days: 5, nights: 4 },
+            price: Number(item.price) || 0,
+            originalPrice: item.original_price ? Number(item.original_price) : undefined,
+            hidePrice: Boolean(item.hide_price),
+            featured: Boolean(item.featured),
+            status: item.status || 'active',
+            rating,
+            reviewsCount,
+            bannerImage: item.banner_image,
+            gallery: item.gallery || [],
+            videoUrl: item.video_url || '',
+            overview: item.overview || '',
+            theme: item.theme || 'Nature',
+            highlights: item.highlights || [],
+            inclusions: item.inclusions || [],
+            exclusions: item.exclusions || [],
+            itinerary: item.itinerary || [],
+            groupSize: item.group_size || 'Customizable',
+            bestTimeToVisit: item.best_time_to_visit || 'Year-round',
+            createdAt: item.created_at,
+            updatedAt: item.updated_at
+          };
+        });
       } else if (!error && data && data.length === 0) {
         // First-time seed: populate Supabase with verified mock packages automatically
         for (const pkg of INITIAL_PACKAGES) {
@@ -97,19 +108,28 @@ export async function POST(request: Request) {
     const bannerImage = normalizeImageUrl(pkg.bannerImage || '');
     const gallery = (pkg.gallery || []).map(normalizeImageUrl);
 
+    const existingIndex = serverPackages.findIndex(p => p.id === id);
+    const existingPkg = existingIndex >= 0 ? serverPackages[existingIndex] : undefined;
+
+    const { rating, reviewsCount } = generateRealisticRating(
+      id,
+      pkg.rating ?? existingPkg?.rating,
+      pkg.reviewsCount ?? existingPkg?.reviewsCount
+    );
+
     const newPackage: TourPackage = {
       ...pkg,
       id,
       slug,
       bannerImage,
       gallery,
-      rating: pkg.rating || 4.9,
-      reviewsCount: pkg.reviewsCount || 1,
+      rating,
+      reviewsCount,
       status: pkg.status || 'active',
-      featured: Boolean(pkg.featured)
+      featured: Boolean(pkg.featured),
+      createdAt: pkg.createdAt || existingPkg?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
-
-    const existingIndex = serverPackages.findIndex(p => p.id === id);
     if (existingIndex >= 0) {
       serverPackages[existingIndex] = newPackage;
     } else {

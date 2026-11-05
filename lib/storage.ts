@@ -24,6 +24,52 @@ export function normalizeImageUrl(url: string): string {
   return trimmed;
 }
 
+/**
+ * Generates or preserves a realistic rating between 4.7 and 5.0,
+ * and review count (e.g. 15-85) ensuring on update it never decreases.
+ */
+export function generateRealisticRating(
+  id: string,
+  existingRating?: number,
+  existingReviewsCount?: number
+): { rating: number; reviewsCount: number } {
+  // If valid existing rating between 4.7 and 5.0 exists, keep it
+  let rating = existingRating && existingRating >= 4.7 && existingRating <= 5.0
+    ? Number(existingRating.toFixed(1))
+    : 0;
+
+  if (!rating) {
+    // Generate deterministic yet pseudo-random rating from ID between 4.7 and 5.0:
+    // e.g. 4.7, 4.8, 4.9, 5.0
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash << 5) - hash + id.charCodeAt(i);
+      hash |= 0;
+    }
+    const ratings = [4.7, 4.8, 4.8, 4.9, 4.9, 4.9, 5.0];
+    rating = ratings[Math.abs(hash) % ratings.length];
+  }
+
+  // Calculate review count: on edit it must never decrease (either same or increases)
+  const currentCount = existingReviewsCount && existingReviewsCount > 1 ? existingReviewsCount : 0;
+  let reviewsCount = currentCount;
+
+  if (reviewsCount <= 1) {
+    // Generate an initial realistic review count between 18 and 85
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash * 31 + id.charCodeAt(i)) & 0xffffff;
+    }
+    reviewsCount = 18 + (hash % 68); // 18 to 85
+  } else {
+    // When modified, optionally increment or keep same (NEVER decrease)
+    // Small chance to add +1 or +2 organic reviews on update
+    reviewsCount = Math.max(currentCount, currentCount + (Math.random() > 0.6 ? 1 : 0));
+  }
+
+  return { rating, reviewsCount };
+}
+
 const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v3';
 const LEADS_STORAGE_KEY = 'tripdesk_leads_v3';
 const SETTINGS_STORAGE_KEY = 'tripdesk_settings_v3';
@@ -224,7 +270,18 @@ export function getStoredPackages(): TourPackage[] {
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(PACKAGES_STORAGE_KEY);
-      if (stored) return JSON.parse(stored);
+      if (stored) {
+        const parsed: TourPackage[] = JSON.parse(stored);
+        // Normalize any old packages that might have had 1 review or missing realistic ratings
+        const normalized = parsed.map((p) => {
+          if (!p.reviewsCount || p.reviewsCount <= 1 || !p.rating || p.rating < 4.7) {
+            const { rating, reviewsCount } = generateRealisticRating(p.id, p.rating, p.reviewsCount);
+            return { ...p, rating, reviewsCount };
+          }
+          return p;
+        });
+        return normalized;
+      }
       localStorage.setItem(PACKAGES_STORAGE_KEY, JSON.stringify(INITIAL_PACKAGES));
     } catch {
       return memoryPackages;
@@ -278,6 +335,15 @@ export async function savePackage(pkg: Partial<TourPackage> & { title: string })
     ? pkg.gallery.filter(Boolean).map(normalizeImageUrl) 
     : [bannerImage];
 
+  const existingIndex = packages.findIndex(p => p.id === id);
+  const existingPkg = existingIndex >= 0 ? packages[existingIndex] : undefined;
+
+  const { rating, reviewsCount } = generateRealisticRating(
+    id,
+    pkg.rating ?? existingPkg?.rating,
+    pkg.reviewsCount ?? existingPkg?.reviewsCount
+  );
+
   const fullPkg: TourPackage = {
     id,
     slug,
@@ -291,8 +357,8 @@ export async function savePackage(pkg: Partial<TourPackage> & { title: string })
     hidePrice: Boolean(pkg.hidePrice),
     featured: Boolean(pkg.featured),
     status: pkg.status || 'active',
-    rating: pkg.rating || 4.9,
-    reviewsCount: pkg.reviewsCount || 1,
+    rating,
+    reviewsCount,
     bannerImage,
     gallery: rawGallery.length ? rawGallery : [bannerImage],
     videoUrl: pkg.videoUrl ? pkg.videoUrl.trim() : '',
@@ -304,11 +370,10 @@ export async function savePackage(pkg: Partial<TourPackage> & { title: string })
     itinerary: pkg.itinerary && pkg.itinerary.length ? pkg.itinerary : [],
     groupSize: pkg.groupSize || 'Customizable',
     bestTimeToVisit: pkg.bestTimeToVisit || 'Year-round',
-    createdAt: pkg.createdAt || new Date().toISOString(),
+    createdAt: pkg.createdAt || existingPkg?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
 
-  const existingIndex = packages.findIndex(p => p.id === id);
   if (existingIndex >= 0) {
     packages[existingIndex] = fullPkg;
   } else {
