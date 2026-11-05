@@ -40,7 +40,9 @@ export async function GET() {
           exclusions: item.exclusions || [],
           itinerary: item.itinerary || [],
           groupSize: item.group_size || 'Customizable',
-          bestTimeToVisit: item.best_time_to_visit || 'Year-round'
+          bestTimeToVisit: item.best_time_to_visit || 'Year-round',
+          createdAt: item.created_at,
+          updatedAt: item.updated_at
         }));
       } else if (!error && data && data.length === 0) {
         // First-time seed: populate Supabase with verified mock packages automatically

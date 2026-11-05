@@ -303,7 +303,9 @@ export async function savePackage(pkg: Partial<TourPackage> & { title: string })
     exclusions: pkg.exclusions && pkg.exclusions.length ? pkg.exclusions.filter(Boolean) : [],
     itinerary: pkg.itinerary && pkg.itinerary.length ? pkg.itinerary : [],
     groupSize: pkg.groupSize || 'Customizable',
-    bestTimeToVisit: pkg.bestTimeToVisit || 'Year-round'
+    bestTimeToVisit: pkg.bestTimeToVisit || 'Year-round',
+    createdAt: pkg.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   const existingIndex = packages.findIndex(p => p.id === id);

@@ -36,6 +36,8 @@ export interface TourPackage {
   itinerary: ItineraryDay[];
   groupSize?: string;
   bestTimeToVisit?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface SiteSettings {
