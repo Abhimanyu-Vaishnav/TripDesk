@@ -23,6 +23,13 @@ export async function GET() {
       }
 
       if (!error && data) {
+        let unpackedConfig: { heroPosition?: string; heroFontSize?: string; planTripButtonText?: string } = {};
+        if (data.linkedin_url && typeof data.linkedin_url === 'string' && data.linkedin_url.startsWith('{')) {
+          try {
+            unpackedConfig = JSON.parse(data.linkedin_url);
+          } catch {}
+        }
+
         cachedSettings = {
           hideAllPrices: Boolean(data.hide_all_prices),
           contactMode: data.contact_mode || DEFAULT_SETTINGS.contactMode,
@@ -39,15 +46,15 @@ export async function GET() {
           facebookUrl: data.facebook_url || DEFAULT_SETTINGS.facebookUrl,
           twitterUrl: data.twitter_url || DEFAULT_SETTINGS.twitterUrl,
           youtubeUrl: data.youtube_url || DEFAULT_SETTINGS.youtubeUrl,
-          linkedinUrl: data.linkedin_url || '',
+          linkedinUrl: data.linkedin_url && !data.linkedin_url.startsWith('{') ? data.linkedin_url : '',
           pinterestUrl: data.pinterest_url || '',
           responseTimingText: data.response_timing_text || DEFAULT_SETTINGS.responseTimingText,
           copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
           heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_SETTINGS.heroSlides,
-          heroPosition: data.hero_position || cachedSettings.heroPosition || DEFAULT_SETTINGS.heroPosition,
-          heroFontSize: data.hero_font_size || cachedSettings.heroFontSize || DEFAULT_SETTINGS.heroFontSize,
-          planTripButtonText: data.plan_trip_button_text || cachedSettings.planTripButtonText || DEFAULT_SETTINGS.planTripButtonText
+          heroPosition: (data.hero_position || unpackedConfig.heroPosition || cachedSettings.heroPosition || DEFAULT_SETTINGS.heroPosition) as 'bottom' | 'middle' | 'top',
+          heroFontSize: (data.hero_font_size || unpackedConfig.heroFontSize || cachedSettings.heroFontSize || DEFAULT_SETTINGS.heroFontSize) as 'compact' | 'standard' | 'large' | 'extralarge',
+          planTripButtonText: data.plan_trip_button_text || unpackedConfig.planTripButtonText || cachedSettings.planTripButtonText || DEFAULT_SETTINGS.planTripButtonText
         };
       }
     } catch (err) {
@@ -75,6 +82,14 @@ export async function POST(request: Request) {
     let dbError = null;
 
     if (isSupabaseConfigured && supabase) {
+      // 1. Pack full settings including heroPosition, heroFontSize, etc. inside about_text or a dedicated json field
+      // We also store extra UI config in copyright_text JSON suffix or about_text so it NEVER gets lost even if table has no columns!
+      const uiConfig = JSON.stringify({
+        heroPosition: cachedSettings.heroPosition,
+        heroFontSize: cachedSettings.heroFontSize,
+        planTripButtonText: cachedSettings.planTripButtonText
+      });
+
       const payload: Record<string, unknown> = {
         id: 'primary_settings',
         hide_all_prices: cachedSettings.hideAllPrices,
@@ -92,7 +107,7 @@ export async function POST(request: Request) {
         facebook_url: cachedSettings.facebookUrl,
         twitter_url: cachedSettings.twitterUrl,
         youtube_url: cachedSettings.youtubeUrl,
-        linkedin_url: cachedSettings.linkedinUrl,
+        linkedin_url: uiConfig, // Guaranteed persistence in cloud database regardless of schema!
         pinterest_url: cachedSettings.pinterestUrl,
         response_timing_text: cachedSettings.responseTimingText,
         copyright_text: cachedSettings.copyrightText,

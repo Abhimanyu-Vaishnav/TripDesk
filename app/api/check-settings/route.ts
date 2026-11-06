@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { getStoredSettings } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,9 +15,11 @@ export async function GET() {
     .eq('id', 'primary_settings')
     .maybeSingle();
 
+  // Inspect columns
   return NextResponse.json({
     success: !error,
     error: error ? error.message : null,
+    columns: data ? Object.keys(data) : [],
     data
   });
 }

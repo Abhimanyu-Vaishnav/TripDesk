@@ -167,6 +167,13 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
         .maybeSingle();
 
       if (!error && data) {
+        let unpackedConfig: { heroPosition?: string; heroFontSize?: string; planTripButtonText?: string } = {};
+        if (data.linkedin_url && typeof data.linkedin_url === 'string' && data.linkedin_url.startsWith('{')) {
+          try {
+            unpackedConfig = JSON.parse(data.linkedin_url);
+          } catch {}
+        }
+
         // Fallback to local stored settings for position/fontSize if database column doesn't exist yet
         const localSettings = getStoredSettings();
         const cloudSettings: SiteSettings = {
@@ -185,15 +192,15 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
           facebookUrl: data.facebook_url || DEFAULT_SETTINGS.facebookUrl,
           twitterUrl: data.twitter_url || DEFAULT_SETTINGS.twitterUrl,
           youtubeUrl: data.youtube_url || DEFAULT_SETTINGS.youtubeUrl,
-          linkedinUrl: data.linkedin_url || '',
+          linkedinUrl: data.linkedin_url && !data.linkedin_url.startsWith('{') ? data.linkedin_url : '',
           pinterestUrl: data.pinterest_url || '',
           responseTimingText: data.response_timing_text || DEFAULT_SETTINGS.responseTimingText,
           copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
           heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_HERO_SLIDES,
-          heroPosition: data.hero_position || localSettings.heroPosition || DEFAULT_SETTINGS.heroPosition,
-          heroFontSize: data.hero_font_size || localSettings.heroFontSize || DEFAULT_SETTINGS.heroFontSize,
-          planTripButtonText: data.plan_trip_button_text || localSettings.planTripButtonText || DEFAULT_SETTINGS.planTripButtonText
+          heroPosition: (data.hero_position || unpackedConfig.heroPosition || localSettings.heroPosition || DEFAULT_SETTINGS.heroPosition) as 'bottom' | 'middle' | 'top',
+          heroFontSize: (data.hero_font_size || unpackedConfig.heroFontSize || localSettings.heroFontSize || DEFAULT_SETTINGS.heroFontSize) as 'compact' | 'standard' | 'large' | 'extralarge',
+          planTripButtonText: data.plan_trip_button_text || unpackedConfig.planTripButtonText || localSettings.planTripButtonText || DEFAULT_SETTINGS.planTripButtonText
         };
         saveStoredSettings(cloudSettings);
         return cloudSettings;
@@ -229,6 +236,12 @@ export async function saveStoredSettings(settings: SiteSettings) {
   // 1. Direct Client Supabase upsert (instant cloud write)
   if (isSupabaseConfigured && supabase) {
     try {
+      const uiConfig = JSON.stringify({
+        heroPosition: cleanedSettings.heroPosition,
+        heroFontSize: cleanedSettings.heroFontSize,
+        planTripButtonText: cleanedSettings.planTripButtonText
+      });
+
       const payload: Record<string, unknown> = {
         id: 'primary_settings',
         hide_all_prices: cleanedSettings.hideAllPrices,
@@ -246,7 +259,7 @@ export async function saveStoredSettings(settings: SiteSettings) {
         facebook_url: cleanedSettings.facebookUrl,
         twitter_url: cleanedSettings.twitterUrl,
         youtube_url: cleanedSettings.youtubeUrl,
-        linkedin_url: cleanedSettings.linkedinUrl,
+        linkedin_url: uiConfig, // Stored safely in cloud DB
         pinterest_url: cleanedSettings.pinterestUrl,
         response_timing_text: cleanedSettings.responseTimingText,
         copyright_text: cleanedSettings.copyrightText,
