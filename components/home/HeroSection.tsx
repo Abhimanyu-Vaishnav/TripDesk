@@ -45,7 +45,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
   };
 
   return (
-    <section className="relative min-h-[88vh] flex items-center justify-center pt-28 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className="relative min-h-[92vh] flex flex-col justify-end pt-36 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background Slideshow with Smooth Crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <AnimatePresence mode="sync">
@@ -66,11 +66,11 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
           </motion.div>
         </AnimatePresence>
 
-        {/* Lighter, high-visibility overlay (enhanced visibility without drowning images) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/35 to-black/20 dark:from-black/60 dark:via-black/40 dark:to-black/30" />
+        {/* Cinematic gradient overlay - darker towards bottom for pristine readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/35 to-black/85" />
       </div>
 
-      {/* Slide Indicators on Bottom Right */}
+      {/* Slide Indicators on Top/Bottom Right */}
       {activeSlides.length > 1 && (
         <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
           {activeSlides.map((item: { url: string; title: string }, idx: number) => (
@@ -88,13 +88,14 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
         </div>
       )}
 
-      <div className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center">
-        {/* Main Clean Headline: theme cream color text, Desk in yellow #DB9309 italic */}
+      {/* Bottom Content Area: Spacious top area lets banner/text images shine */}
+      <div className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center mt-auto">
+        {/* Single Line Sleek Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-[#FEFAEE] tracking-tight leading-[1.15] max-w-4xl drop-shadow-[0_4px_14px_rgba(0,0,0,0.9)]"
+          className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-[#FEFAEE] tracking-tight leading-tight max-w-5xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] whitespace-nowrap"
         >
           {headline && headline.trim() !== '' && headline !== 'From Desk to Dream Destination' ? (
             <span>{headline}</span>
@@ -110,15 +111,15 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="mt-8 sm:mt-10 w-full max-w-4xl"
+          className="mt-5 sm:mt-6 w-full max-w-4xl"
         >
           <form
             onSubmit={handleSearchSubmit}
-            className="bg-[#FEFAEE]/95 dark:bg-[#1D1008]/95 backdrop-blur-md p-3.5 sm:p-4 rounded-3xl shadow-2xl border-2 border-[#DB9309] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-left transition-colors"
+            className="bg-[#FEFAEE]/95 dark:bg-[#1D1008]/95 backdrop-blur-md p-3 sm:p-3.5 rounded-3xl shadow-2xl border-2 border-[#DB9309] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-left transition-colors"
           >
             {/* 1. State / Region */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
-              <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="p-2 sm:p-2.5 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+              <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-[#DB9309]" /> State / Region
               </label>
               <select
@@ -135,8 +136,8 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
             </div>
 
             {/* 2. Destination Search Keyword */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
-              <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="p-2 sm:p-2.5 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+              <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                 <Compass className="w-3.5 h-3.5 text-[#DB9309]" /> Destination / City
               </label>
               <input
@@ -149,8 +150,8 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
             </div>
 
             {/* 3. Duration: User Input (e.g. 3, 5, 7 Days) */}
-            <div className="p-2 sm:p-3 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
-              <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <div className="p-2 sm:p-2.5 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+              <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-[#DB9309]" /> Trip Duration
               </label>
               <input
@@ -168,7 +169,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
             <div className="flex items-center">
               <button
                 type="submit"
-                className="w-full h-full min-h-[50px] rounded-2xl bg-[#DB9309] hover:bg-[#c27f05] text-[#351202] hover:text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 group active:scale-95"
+                className="w-full h-full min-h-[46px] rounded-2xl bg-[#DB9309] hover:bg-[#c27f05] text-[#351202] hover:text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 group active:scale-95 cursor-pointer"
               >
                 <Search className="w-4 h-4 text-[#351202] group-hover:text-white transition-colors" />
                 <span>Search Journeys</span>
@@ -182,7 +183,7 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-[#FEFAEE] text-xs sm:text-sm font-medium drop-shadow"
+          className="mt-4 sm:mt-5 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-[#FEFAEE] text-xs sm:text-sm font-medium drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
         >
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-[#DB9309]" />
