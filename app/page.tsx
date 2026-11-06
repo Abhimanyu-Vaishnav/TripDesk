@@ -219,6 +219,8 @@ export default function HomePage() {
           onSearch={handleHeroSearch}
           slides={settings?.heroSlides}
           headline={settings?.heroTitle}
+          position={settings?.heroPosition || 'bottom'}
+          fontSize={settings?.heroFontSize || 'standard'}
         />
 
         {/* Explore States Grid - Dynamically computed from active packages */}

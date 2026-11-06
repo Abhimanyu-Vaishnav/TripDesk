@@ -44,7 +44,9 @@ export async function GET() {
           responseTimingText: data.response_timing_text || DEFAULT_SETTINGS.responseTimingText,
           copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
-          heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_SETTINGS.heroSlides
+          heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_SETTINGS.heroSlides,
+          heroPosition: data.hero_position || DEFAULT_SETTINGS.heroPosition,
+          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize
         };
       }
     } catch (err) {
@@ -95,6 +97,8 @@ export async function POST(request: Request) {
         copyright_text: cachedSettings.copyrightText,
         hero_title: cachedSettings.heroTitle,
         hero_slides: cachedSettings.heroSlides,
+        hero_position: cachedSettings.heroPosition,
+        hero_font_size: cachedSettings.heroFontSize,
         updated_at: new Date().toISOString()
       });
 

@@ -112,7 +112,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   responseTimingText: '⚡ Response time: Under 2 hours',
   copyrightText: '© 2026 TripDesk Holidays LLP. All Rights Reserved.',
   heroTitle: '',
-  heroSlides: DEFAULT_HERO_SLIDES
+  heroSlides: DEFAULT_HERO_SLIDES,
+  heroPosition: 'bottom',
+  heroFontSize: 'standard'
 };
 
 let memorySettings: SiteSettings = { ...DEFAULT_SETTINGS };
@@ -185,7 +187,9 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
           responseTimingText: data.response_timing_text || DEFAULT_SETTINGS.responseTimingText,
           copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
-          heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_HERO_SLIDES
+          heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_HERO_SLIDES,
+          heroPosition: data.hero_position || DEFAULT_SETTINGS.heroPosition,
+          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize
         };
         saveStoredSettings(cloudSettings);
         return cloudSettings;
@@ -244,6 +248,8 @@ export async function saveStoredSettings(settings: SiteSettings) {
         copyright_text: cleanedSettings.copyrightText,
         hero_title: cleanedSettings.heroTitle,
         hero_slides: cleanedSettings.heroSlides,
+        hero_position: cleanedSettings.heroPosition,
+        hero_font_size: cleanedSettings.heroFontSize,
         updated_at: new Date().toISOString()
       });
     } catch (dbErr) {

@@ -10,9 +10,17 @@ interface HeroSectionProps {
   onSearch: (filters: { state: string; destination: string; budget: string; duration: string }) => void;
   slides?: { url: string; title: string }[];
   headline?: string;
+  position?: 'bottom' | 'middle' | 'top';
+  fontSize?: 'compact' | 'standard' | 'large' | 'extralarge';
 }
 
-export default function HeroSection({ onSearch, slides, headline }: HeroSectionProps) {
+export default function HeroSection({
+  onSearch,
+  slides,
+  headline,
+  position = 'bottom',
+  fontSize = 'standard'
+}: HeroSectionProps) {
   const [selectedState, setSelectedState] = useState('All States');
   const [searchDestination, setSearchDestination] = useState('');
   const [customDays, setCustomDays] = useState('');
@@ -44,8 +52,29 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
     }
   };
 
+  // Position alignment styling
+  const sectionAlignmentClass =
+    position === 'top'
+      ? 'justify-start pt-28 pb-16'
+      : position === 'middle'
+      ? 'justify-center pt-28 pb-16'
+      : 'justify-end pt-32 pb-10 sm:pb-14';
+
+  const containerMarginClass =
+    position === 'top' ? 'mt-4 mb-auto' : position === 'middle' ? 'my-auto' : 'mt-auto';
+
+  // Font size classes for the headline
+  const headlineSizeClass =
+    fontSize === 'compact'
+      ? 'text-xl sm:text-2xl md:text-3xl lg:text-4xl'
+      : fontSize === 'large'
+      ? 'text-2xl sm:text-4xl md:text-5xl lg:text-6xl'
+      : fontSize === 'extralarge'
+      ? 'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold'
+      : 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'; // standard default
+
   return (
-    <section className="relative min-h-[92vh] flex flex-col justify-end pt-36 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className={`relative min-h-[92vh] flex flex-col ${sectionAlignmentClass} px-4 sm:px-6 lg:px-8 overflow-hidden`}>
       {/* Background Slideshow with Smooth Crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <AnimatePresence mode="sync">
@@ -66,11 +95,19 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
           </motion.div>
         </AnimatePresence>
 
-        {/* Cinematic gradient overlay - darker towards bottom for pristine readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/35 to-black/85" />
+        {/* Cinematic gradient overlay dynamically adapted to position */}
+        <div
+          className={`absolute inset-0 ${
+            position === 'middle'
+              ? 'bg-gradient-to-r from-black/60 via-black/45 to-black/35'
+              : position === 'top'
+              ? 'bg-gradient-to-b from-black/85 via-black/40 to-black/20'
+              : 'bg-gradient-to-b from-black/20 via-black/35 to-black/85'
+          }`}
+        />
       </div>
 
-      {/* Slide Indicators on Top/Bottom Right */}
+      {/* Slide Indicators on Bottom Right */}
       {activeSlides.length > 1 && (
         <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
           {activeSlides.map((item: { url: string; title: string }, idx: number) => (
@@ -88,14 +125,14 @@ export default function HeroSection({ onSearch, slides, headline }: HeroSectionP
         </div>
       )}
 
-      {/* Bottom Content Area: Spacious top area lets banner/text images shine */}
-      <div className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center mt-auto">
-        {/* Single Line Sleek Headline */}
+      {/* Content Area: Configurable vertical positioning */}
+      <div className={`relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center ${containerMarginClass}`}>
+        {/* Sleek Headline with Configurable Size */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-[#FEFAEE] tracking-tight leading-tight max-w-5xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] whitespace-nowrap"
+          className={`font-serif font-bold text-[#FEFAEE] tracking-tight leading-tight max-w-5xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] sm:whitespace-nowrap ${headlineSizeClass}`}
         >
           {headline && headline.trim() !== '' && headline !== 'From Desk to Dream Destination' ? (
             <span>{headline}</span>

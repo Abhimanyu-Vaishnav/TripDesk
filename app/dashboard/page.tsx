@@ -1089,6 +1089,56 @@ export default function OwnerDashboardPage() {
                 />
               </div>
 
+              {/* Dynamic Hero Layout & Typography Controls */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612]">
+                <div>
+                  <label className="block text-xs font-bold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                    Hero Section Position (Upar ya Niche)
+                  </label>
+                  <p className="text-[11px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mb-2">
+                    Adjust vertical position of Headline & Search Box on your landing page.
+                  </p>
+                  <select
+                    value={settings.heroPosition || 'bottom'}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        heroPosition: e.target.value as 'bottom' | 'middle' | 'top'
+                      })
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
+                  >
+                    <option value="bottom">Bottom (Niche - Best for Banners with text)</option>
+                    <option value="middle">Middle (Center of Screen)</option>
+                    <option value="top">Top (Upar)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                    Headline Font Size (Tagline Ka Size)
+                  </label>
+                  <p className="text-[11px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mb-2">
+                    Control how large or compact the main tagline appears.
+                  </p>
+                  <select
+                    value={settings.heroFontSize || 'standard'}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        heroFontSize: e.target.value as 'compact' | 'standard' | 'large' | 'extralarge'
+                      })
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
+                  >
+                    <option value="compact">Compact (Chhota & Sleek)</option>
+                    <option value="standard">Standard (Balanced Modern)</option>
+                    <option value="large">Large (Bold & Clear)</option>
+                    <option value="extralarge">Extra Large (Maximum Impact)</option>
+                  </select>
+                </div>
+              </div>
+
               <div className="space-y-3">
                 <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE]">
                   Slideshow Images ({settings.heroSlides?.length || 0} active slides)

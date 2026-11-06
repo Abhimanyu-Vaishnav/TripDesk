@@ -65,6 +65,8 @@ export interface SiteSettings {
   // Hero & Homepage Customization
   heroTitle?: string;
   heroSlides?: { url: string; title: string }[];
+  heroPosition?: 'bottom' | 'middle' | 'top'; // Vertical position of hero title & search box
+  heroFontSize?: 'compact' | 'standard' | 'large' | 'extralarge'; // Tagline / Headline text size
 }
 
 export interface LeadInquiry {
