@@ -64,7 +64,7 @@ export interface SiteSettings {
   copyrightText?: string;
   // Hero & Homepage Customization
   heroTitle?: string;
-  heroSlides?: { url: string; title: string }[];
+  heroSlides?: { url: string; title: string; mobileUrl?: string }[];
   heroPosition?: 'bottom' | 'middle' | 'top'; // Vertical position of hero title & search box
   heroFontSize?: 'compact' | 'standard' | 'large' | 'extralarge'; // Tagline / Headline text size
   planTripButtonText?: string; // Customizable CTA text in Navbar (e.g. "Plan My Trip")

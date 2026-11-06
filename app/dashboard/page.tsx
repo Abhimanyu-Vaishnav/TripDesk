@@ -1156,35 +1156,100 @@ export default function OwnerDashboardPage() {
               </div>
 
               <div className="space-y-3">
-                <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE]">
-                  Slideshow Images ({settings.heroSlides?.length || 0} active slides)
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-semibold text-[#351202] dark:text-[#FEFAEE]">
+                    Slideshow Images ({settings.heroSlides?.length || 0} active slides)
+                  </label>
+                  <span className="text-[11px] text-[#DB9309] font-medium">
+                    Dual Banners: Landscape for PC/Tablet & Portrait for Mobile
+                  </span>
+                </div>
+
                 {(settings.heroSlides || []).map((slide, idx) => (
-                  <div key={idx} className="p-3 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612] flex flex-col sm:flex-row items-center gap-3">
-                    <div className="relative w-20 h-14 rounded-lg overflow-hidden bg-black/10 shrink-0 border border-[#EADBBA] dark:border-[#4D2612]">
-                      <img 
-                        src={normalizeImageUrl(slide.url)} 
-                        alt={slide.title} 
-                        className="w-full h-full object-cover" 
-                        onError={(e) => {
-                          // Fallback if image fails
-                          (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
-                      <input
-                        type="url"
-                        value={slide.url}
-                        onChange={(e) => {
-                          const converted = normalizeImageUrl(e.target.value);
-                          const updated = [...(settings.heroSlides || [])];
-                          updated[idx] = { ...updated[idx], url: converted };
+                  <div key={idx} className="p-4 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612] flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#DB9309]">
+                        Slide #{idx + 1} • {slide.title || 'Untitled Slide'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = (settings.heroSlides || []).filter((_, i) => i !== idx);
                           setSettings({ ...settings, heroSlides: updated });
                         }}
-                        placeholder="Image URL (Unsplash, Google Drive share link, etc.)"
-                        className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs font-mono"
-                      />
+                        className="p-1 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1 text-xs"
+                        title="Delete Slide"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {/* Desktop / Landscape Banner */}
+                      <div className="p-3 bg-white dark:bg-[#1D1008] rounded-xl border border-[#EADBBA] dark:border-[#4D2612] flex items-center gap-3">
+                        <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-black/10 shrink-0 border border-[#EADBBA] dark:border-[#4D2612]">
+                          <img 
+                            src={normalizeImageUrl(slide.url)} 
+                            alt={slide.title} 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-[10px] uppercase font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 mb-1">
+                            🖥️ Desktop / Tablet Banner (Landscape) *
+                          </label>
+                          <input
+                            type="url"
+                            value={slide.url}
+                            onChange={(e) => {
+                              const converted = normalizeImageUrl(e.target.value);
+                              const updated = [...(settings.heroSlides || [])];
+                              updated[idx] = { ...updated[idx], url: converted };
+                              setSettings({ ...settings, heroSlides: updated });
+                            }}
+                            placeholder="Landscape Image URL (Drive/Unsplash)"
+                            className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Mobile / Portrait Banner */}
+                      <div className="p-3 bg-white dark:bg-[#1D1008] rounded-xl border border-[#EADBBA] dark:border-[#4D2612] flex items-center gap-3">
+                        <div className="relative w-12 h-14 rounded-lg overflow-hidden bg-black/10 shrink-0 border border-[#EADBBA] dark:border-[#4D2612]">
+                          <img 
+                            src={normalizeImageUrl(slide.mobileUrl || slide.url)} 
+                            alt={`${slide.title} mobile`} 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-[10px] uppercase font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 mb-1">
+                            📱 Mobile Banner (Portrait - Optional)
+                          </label>
+                          <input
+                            type="url"
+                            value={slide.mobileUrl || ''}
+                            onChange={(e) => {
+                              const converted = normalizeImageUrl(e.target.value);
+                              const updated = [...(settings.heroSlides || [])];
+                              updated[idx] = { ...updated[idx], mobileUrl: converted };
+                              setSettings({ ...settings, heroSlides: updated });
+                            }}
+                            placeholder="Portrait Image URL (Leave blank to use desktop image)"
+                            className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-[#FEFAEE] dark:bg-[#120904] text-xs font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
                       <input
                         type="text"
                         value={slide.title}
@@ -1193,21 +1258,10 @@ export default function OwnerDashboardPage() {
                           updated[idx] = { ...updated[idx], title: e.target.value };
                           setSettings({ ...settings, heroSlides: updated });
                         }}
-                        placeholder="Slide Title / Caption (e.g. Kashmir Peaks)"
+                        placeholder="Slide Title / Caption (e.g. Kashmir Valley Peaks)"
                         className="w-full px-3 py-1.5 rounded-lg border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updated = (settings.heroSlides || []).filter((_, i) => i !== idx);
-                        setSettings({ ...settings, heroSlides: updated });
-                      }}
-                      className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                      title="Delete Slide"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 ))}
               </div>

@@ -70,7 +70,8 @@ export async function POST(request: Request) {
     const body: SiteSettings = await request.json();
     const heroSlides = (body.heroSlides || []).map(s => ({
       ...s,
-      url: normalizeImageUrl(s.url)
+      url: normalizeImageUrl(s.url),
+      mobileUrl: s.mobileUrl ? normalizeImageUrl(s.mobileUrl) : undefined
     }));
 
     cachedSettings = {

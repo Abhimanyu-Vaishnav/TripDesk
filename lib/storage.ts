@@ -74,7 +74,7 @@ const PACKAGES_STORAGE_KEY = 'tripdesk_packages_v3';
 const LEADS_STORAGE_KEY = 'tripdesk_leads_v3';
 const SETTINGS_STORAGE_KEY = 'tripdesk_settings_v3';
 
-export const DEFAULT_HERO_SLIDES = [
+export const DEFAULT_HERO_SLIDES: { url: string; title: string; mobileUrl?: string }[] = [
   {
     url: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1920&q=80',
     title: 'Kerala Backwaters & Houseboats'
@@ -216,7 +216,8 @@ export async function saveStoredSettings(settings: SiteSettings) {
   // Normalize Google Drive links in hero slides if present
   const cleanedHeroSlides = (settings.heroSlides || []).map(s => ({
     ...s,
-    url: normalizeImageUrl(s.url)
+    url: normalizeImageUrl(s.url),
+    mobileUrl: s.mobileUrl ? normalizeImageUrl(s.mobileUrl) : undefined
   }));
 
   const cleanedSettings: SiteSettings = {

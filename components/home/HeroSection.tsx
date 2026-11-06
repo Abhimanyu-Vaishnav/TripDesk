@@ -8,7 +8,7 @@ import { DEFAULT_HERO_SLIDES } from '@/lib/storage';
 
 interface HeroSectionProps {
   onSearch: (filters: { state: string; destination: string; budget: string; duration: string }) => void;
-  slides?: { url: string; title: string }[];
+  slides?: { url: string; title: string; mobileUrl?: string }[];
   headline?: string;
   position?: 'bottom' | 'middle' | 'top';
   fontSize?: 'compact' | 'standard' | 'large' | 'extralarge';
@@ -93,12 +93,20 @@ export default function HeroSection({
             transition={{ duration: 1.4, ease: 'easeInOut' }}
             className="absolute inset-0"
           >
-            <img
-              src={activeSlides[currentSlide]?.url || DEFAULT_HERO_SLIDES[0].url}
-              alt={activeSlides[currentSlide]?.title || 'TripDesk Destination'}
-              fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
-              className="w-full h-full object-cover object-center"
-            />
+            <picture className="w-full h-full">
+              {activeSlides[currentSlide]?.mobileUrl && (
+                <source
+                  media="(max-width: 640px)"
+                  srcSet={activeSlides[currentSlide]?.mobileUrl}
+                />
+              )}
+              <img
+                src={activeSlides[currentSlide]?.url || DEFAULT_HERO_SLIDES[0].url}
+                alt={activeSlides[currentSlide]?.title || 'TripDesk Destination'}
+                fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
+                className="w-full h-full object-cover object-center"
+              />
+            </picture>
           </motion.div>
         </AnimatePresence>
 
