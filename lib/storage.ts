@@ -167,6 +167,8 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
         .maybeSingle();
 
       if (!error && data) {
+        // Fallback to local stored settings for position/fontSize if database column doesn't exist yet
+        const localSettings = getStoredSettings();
         const cloudSettings: SiteSettings = {
           hideAllPrices: Boolean(data.hide_all_prices),
           contactMode: data.contact_mode || DEFAULT_SETTINGS.contactMode,
@@ -189,9 +191,9 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
           copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
           heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_HERO_SLIDES,
-          heroPosition: data.hero_position || DEFAULT_SETTINGS.heroPosition,
-          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize,
-          planTripButtonText: data.plan_trip_button_text || DEFAULT_SETTINGS.planTripButtonText
+          heroPosition: data.hero_position || localSettings.heroPosition || DEFAULT_SETTINGS.heroPosition,
+          heroFontSize: data.hero_font_size || localSettings.heroFontSize || DEFAULT_SETTINGS.heroFontSize,
+          planTripButtonText: data.plan_trip_button_text || localSettings.planTripButtonText || DEFAULT_SETTINGS.planTripButtonText
         };
         saveStoredSettings(cloudSettings);
         return cloudSettings;
@@ -227,7 +229,7 @@ export async function saveStoredSettings(settings: SiteSettings) {
   // 1. Direct Client Supabase upsert (instant cloud write)
   if (isSupabaseConfigured && supabase) {
     try {
-      await supabase.from('site_settings').upsert({
+      const payload: Record<string, unknown> = {
         id: 'primary_settings',
         hide_all_prices: cleanedSettings.hideAllPrices,
         contact_mode: cleanedSettings.contactMode,
@@ -254,7 +256,15 @@ export async function saveStoredSettings(settings: SiteSettings) {
         hero_font_size: cleanedSettings.heroFontSize,
         plan_trip_button_text: cleanedSettings.planTripButtonText,
         updated_at: new Date().toISOString()
-      });
+      };
+
+      const { error } = await supabase.from('site_settings').upsert(payload);
+      if (error && error.message && error.message.includes('column')) {
+        delete payload.hero_position;
+        delete payload.hero_font_size;
+        delete payload.plan_trip_button_text;
+        await supabase.from('site_settings').upsert(payload);
+      }
     } catch (dbErr) {
       console.warn('Direct client Supabase save error:', dbErr);
     }

@@ -45,9 +45,9 @@ export async function GET() {
           copyrightText: data.copyright_text || DEFAULT_SETTINGS.copyrightText,
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
           heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_SETTINGS.heroSlides,
-          heroPosition: data.hero_position || DEFAULT_SETTINGS.heroPosition,
-          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize,
-          planTripButtonText: data.plan_trip_button_text || DEFAULT_SETTINGS.planTripButtonText
+          heroPosition: data.hero_position || cachedSettings.heroPosition || DEFAULT_SETTINGS.heroPosition,
+          heroFontSize: data.hero_font_size || cachedSettings.heroFontSize || DEFAULT_SETTINGS.heroFontSize,
+          planTripButtonText: data.plan_trip_button_text || cachedSettings.planTripButtonText || DEFAULT_SETTINGS.planTripButtonText
         };
       }
     } catch (err) {
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     let dbError = null;
 
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from('site_settings').upsert({
+      const payload: Record<string, unknown> = {
         id: 'primary_settings',
         hide_all_prices: cachedSettings.hideAllPrices,
         contact_mode: cachedSettings.contactMode,
@@ -102,11 +102,24 @@ export async function POST(request: Request) {
         hero_font_size: cachedSettings.heroFontSize,
         plan_trip_button_text: cachedSettings.planTripButtonText,
         updated_at: new Date().toISOString()
-      });
+      };
+
+      const { error } = await supabase.from('site_settings').upsert(payload);
 
       if (error) {
         console.error('Supabase site_settings upsert error:', error);
         dbError = error.message;
+
+        // If error was missing columns in Supabase, retry without extra columns
+        if (error.message && error.message.includes('column')) {
+          delete payload.hero_position;
+          delete payload.hero_font_size;
+          delete payload.plan_trip_button_text;
+          const retry = await supabase.from('site_settings').upsert(payload);
+          if (!retry.error) {
+            dbError = null;
+          }
+        }
       }
     }
 
