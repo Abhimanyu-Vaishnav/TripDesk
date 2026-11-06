@@ -58,10 +58,10 @@ export default function HeroSection({
   const isBottom = position === 'bottom' || (!isTop && !isMiddle);
 
   const sectionPaddingClass = isTop
-    ? 'pt-32 pb-16 justify-start'
+    ? 'pt-24 sm:pt-32 pb-12 sm:pb-16 justify-start'
     : isMiddle
-    ? 'py-28 justify-center'
-    : 'pt-36 pb-8 sm:pb-12 justify-end';
+    ? 'pt-24 sm:pt-28 pb-12 sm:pb-28 justify-center'
+    : 'pt-24 sm:pt-36 pb-8 sm:pb-12 justify-end';
 
   const containerMarginClass = isTop
     ? 'mt-2 mb-auto'
@@ -70,17 +70,18 @@ export default function HeroSection({
     : 'mt-auto mb-2';
 
   // Responsive headline font sizes (from compact to extra large)
+  // On mobile (< 640px), always bold, large, readable (text-3xl to text-4xl)
   const headlineSizeClass =
     fontSize === 'compact'
-      ? 'text-lg sm:text-xl md:text-2xl lg:text-3xl'
+      ? 'text-2xl sm:text-2xl md:text-3xl lg:text-4xl'
       : fontSize === 'large'
-      ? 'text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold'
+      ? 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold'
       : fontSize === 'extralarge'
-      ? 'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold'
-      : 'text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold'; // standard
+      ? 'text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold'
+      : 'text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-bold'; // standard
 
   return (
-    <section className={`relative min-h-[90vh] flex flex-col ${sectionPaddingClass} px-4 sm:px-6 lg:px-8 overflow-hidden`}>
+    <section className={`relative min-h-[92vh] sm:min-h-[90vh] flex flex-col ${sectionPaddingClass} px-3 sm:px-6 lg:px-8 overflow-hidden`}>
       {/* Background Slideshow with Smooth Crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <AnimatePresence mode="sync">
@@ -105,25 +106,25 @@ export default function HeroSection({
         <div
           className={`absolute inset-0 ${
             position === 'middle'
-              ? 'bg-gradient-to-r from-black/60 via-black/45 to-black/35'
+              ? 'bg-gradient-to-b from-black/50 via-black/40 to-black/70 sm:bg-gradient-to-r sm:from-black/60 sm:via-black/45 sm:to-black/35'
               : position === 'top'
               ? 'bg-gradient-to-b from-black/85 via-black/40 to-black/20'
-              : 'bg-gradient-to-b from-black/20 via-black/35 to-black/85'
+              : 'bg-gradient-to-b from-black/30 via-black/40 to-black/90 sm:from-black/20 sm:via-black/35 sm:to-black/85'
           }`}
         />
       </div>
 
-      {/* Slide Indicators on Bottom Right */}
+      {/* Slide Indicators on Bottom Right - Also visible as sleek mini-dots on mobile */}
       {activeSlides.length > 1 && (
-        <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+        <div className="absolute top-20 right-4 sm:top-auto sm:bottom-6 sm:right-6 z-20 flex items-center gap-1.5 sm:gap-2 bg-black/50 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/20 shadow-md">
           {activeSlides.map((item: { url: string; title: string }, idx: number) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
               className={`transition-all duration-300 rounded-full ${
                 idx === currentSlide
-                  ? 'w-6 h-2 bg-[#DB9309]'
-                  : 'w-2 h-2 bg-white/50 hover:bg-white/80'
+                  ? 'w-4 sm:w-6 h-1.5 sm:h-2 bg-[#DB9309]'
+                  : 'w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/50 hover:bg-white/80'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
@@ -133,12 +134,12 @@ export default function HeroSection({
 
       {/* Content Area: Configurable vertical positioning */}
       <div className={`relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center ${containerMarginClass}`}>
-        {/* Sleek Headline with Configurable Size */}
+        {/* Sleek Headline with Configurable Size - Mobile friendly multi/single wrap */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className={`font-serif font-bold text-[#FEFAEE] tracking-tight leading-tight max-w-5xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] sm:whitespace-nowrap ${headlineSizeClass}`}
+          className={`font-serif font-bold text-[#FEFAEE] tracking-tight leading-[1.2] sm:leading-tight max-w-5xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] sm:whitespace-nowrap px-2 ${headlineSizeClass}`}
         >
           {headline && headline.trim() !== '' && headline !== 'From Desk to Dream Destination' ? (
             <span>{headline}</span>
@@ -154,14 +155,14 @@ export default function HeroSection({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="mt-5 sm:mt-6 w-full max-w-4xl"
+          className="mt-4 sm:mt-6 w-full max-w-4xl px-1 sm:px-0"
         >
           <form
             onSubmit={handleSearchSubmit}
-            className="bg-[#FEFAEE]/95 dark:bg-[#1D1008]/95 backdrop-blur-md p-3 sm:p-3.5 rounded-3xl shadow-2xl border-2 border-[#DB9309] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-left transition-colors"
+            className="bg-[#FEFAEE]/95 dark:bg-[#1D1008]/95 backdrop-blur-md p-2.5 sm:p-3.5 rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-[#DB9309] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 text-left transition-colors"
           >
             {/* 1. State / Region */}
-            <div className="p-2 sm:p-2.5 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+            <div className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
               <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-[#DB9309]" /> State / Region
               </label>
@@ -179,7 +180,7 @@ export default function HeroSection({
             </div>
 
             {/* 2. Destination Search Keyword */}
-            <div className="p-2 sm:p-2.5 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+            <div className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
               <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                 <Compass className="w-3.5 h-3.5 text-[#DB9309]" /> Destination / City
               </label>
@@ -193,7 +194,7 @@ export default function HeroSection({
             </div>
 
             {/* 3. Duration: User Input (e.g. 3, 5, 7 Days) */}
-            <div className="p-2 sm:p-2.5 rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
+            <div className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-[#FEFAEE] dark:bg-[#120904] border border-[#EADBBA] dark:border-[#4D2612] hover:border-[#DB9309] transition-all">
               <label className="block text-[10px] font-bold text-[#351202]/70 dark:text-[#FEFAEE]/70 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-[#DB9309]" /> Trip Duration
               </label>
@@ -212,7 +213,7 @@ export default function HeroSection({
             <div className="flex items-center">
               <button
                 type="submit"
-                className="w-full h-full min-h-[46px] rounded-2xl bg-[#DB9309] hover:bg-[#c27f05] text-[#351202] hover:text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 group active:scale-95 cursor-pointer"
+                className="w-full h-full min-h-[44px] sm:min-h-[46px] rounded-xl sm:rounded-2xl bg-[#DB9309] hover:bg-[#c27f05] text-[#351202] hover:text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 group active:scale-95 cursor-pointer"
               >
                 <Search className="w-4 h-4 text-[#351202] group-hover:text-white transition-colors" />
                 <span>Search Journeys</span>
@@ -226,19 +227,19 @@ export default function HeroSection({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="mt-4 sm:mt-5 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-[#FEFAEE] text-xs sm:text-sm font-medium drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+          className="mt-3 sm:mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-8 text-[#FEFAEE] text-[11px] sm:text-sm font-medium drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
         >
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-[#DB9309]" />
-            <span>100% Customized Itineraries</span>
+          <div className="flex items-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#DB9309]" />
+            <span>100% Customized</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[#DB9309]">★ 4.9/5</span>
-            <span>2,500+ Happy Travelers</span>
+          <div className="flex items-center gap-1">
+            <span className="text-[#DB9309] font-bold">★ 4.9/5</span>
+            <span>2,500+ Travelers</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>24/7 Dedicated Trip Concierge</span>
+            <span>24/7 Concierge</span>
           </div>
         </motion.div>
       </div>
