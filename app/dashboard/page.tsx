@@ -1090,13 +1090,13 @@ export default function OwnerDashboardPage() {
               </div>
 
               {/* Dynamic Hero Layout & Typography Controls */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612]">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-[#FDF7E7] dark:bg-[#120904] rounded-2xl border border-[#EADBBA] dark:border-[#4D2612]">
                 <div>
                   <label className="block text-xs font-bold text-[#351202] dark:text-[#FEFAEE] mb-1">
-                    Hero Section Position (Upar ya Niche)
+                    Hero Section Alignment
                   </label>
                   <p className="text-[11px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mb-2">
-                    Adjust vertical position of Headline & Search Box on your landing page.
+                    Vertical placement of title and journey search bar on landing page.
                   </p>
                   <select
                     value={settings.heroPosition || 'bottom'}
@@ -1108,18 +1108,18 @@ export default function OwnerDashboardPage() {
                     }
                     className="w-full px-3 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
                   >
-                    <option value="bottom">Bottom (Niche - Best for Banners with text)</option>
-                    <option value="middle">Middle (Center of Screen)</option>
-                    <option value="top">Top (Upar)</option>
+                    <option value="bottom">Bottom Aligned (Recommended for Graphic Banners)</option>
+                    <option value="middle">Center Aligned (Default Classic)</option>
+                    <option value="top">Top Aligned</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-[#351202] dark:text-[#FEFAEE] mb-1">
-                    Headline Font Size (Tagline Ka Size)
+                    Headline Typography Scale
                   </label>
                   <p className="text-[11px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mb-2">
-                    Control how large or compact the main tagline appears.
+                    Size scale for the primary headline banner text.
                   </p>
                   <select
                     value={settings.heroFontSize || 'standard'}
@@ -1131,11 +1131,27 @@ export default function OwnerDashboardPage() {
                     }
                     className="w-full px-3 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309] cursor-pointer"
                   >
-                    <option value="compact">Compact (Chhota & Sleek)</option>
-                    <option value="standard">Standard (Balanced Modern)</option>
-                    <option value="large">Large (Bold & Clear)</option>
-                    <option value="extralarge">Extra Large (Maximum Impact)</option>
+                    <option value="compact">Compact (Subtle & Sleek)</option>
+                    <option value="standard">Standard (Balanced Display)</option>
+                    <option value="large">Large (Bold Prominence)</option>
+                    <option value="extralarge">Extra Large (Maximum High-Impact)</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#351202] dark:text-[#FEFAEE] mb-1">
+                    Navbar Primary CTA Label
+                  </label>
+                  <p className="text-[11px] text-[#351202]/60 dark:text-[#FEFAEE]/60 mb-2">
+                    Button label in navigation header (default: Plan My Trip).
+                  </p>
+                  <input
+                    type="text"
+                    value={settings.planTripButtonText || ''}
+                    onChange={(e) => setSettings({ ...settings, planTripButtonText: e.target.value })}
+                    placeholder="Plan My Trip"
+                    className="w-full px-3 py-2 rounded-xl border border-[#EADBBA] dark:border-[#4D2612] bg-white dark:bg-[#1D1008] text-xs font-semibold text-[#351202] dark:text-[#FEFAEE] focus:outline-none focus:border-[#DB9309]"
+                  />
                 </div>
               </div>
 

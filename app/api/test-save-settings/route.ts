@@ -43,6 +43,9 @@ export async function POST(request: Request) {
         copyright_text: settings.copyrightText,
         hero_title: settings.heroTitle,
         hero_slides: settings.heroSlides,
+        hero_position: settings.heroPosition,
+        hero_font_size: settings.heroFontSize,
+        plan_trip_button_text: settings.planTripButtonText,
         updated_at: new Date().toISOString()
       })
       .eq('id', 'primary_settings')

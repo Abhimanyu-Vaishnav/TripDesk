@@ -52,29 +52,35 @@ export default function HeroSection({
     }
   };
 
-  // Position alignment styling
-  const sectionAlignmentClass =
-    position === 'top'
-      ? 'justify-start pt-28 pb-16'
-      : position === 'middle'
-      ? 'justify-center pt-28 pb-16'
-      : 'justify-end pt-32 pb-10 sm:pb-14';
+  // Dynamic vertical layout classes
+  const isTop = position === 'top';
+  const isMiddle = position === 'middle';
+  const isBottom = position === 'bottom' || (!isTop && !isMiddle);
 
-  const containerMarginClass =
-    position === 'top' ? 'mt-4 mb-auto' : position === 'middle' ? 'my-auto' : 'mt-auto';
+  const sectionPaddingClass = isTop
+    ? 'pt-32 pb-16 justify-start'
+    : isMiddle
+    ? 'py-28 justify-center'
+    : 'pt-36 pb-8 sm:pb-12 justify-end';
 
-  // Font size classes for the headline
+  const containerMarginClass = isTop
+    ? 'mt-2 mb-auto'
+    : isMiddle
+    ? 'my-auto'
+    : 'mt-auto mb-2';
+
+  // Responsive headline font sizes (from compact to extra large)
   const headlineSizeClass =
     fontSize === 'compact'
-      ? 'text-xl sm:text-2xl md:text-3xl lg:text-4xl'
+      ? 'text-lg sm:text-xl md:text-2xl lg:text-3xl'
       : fontSize === 'large'
-      ? 'text-2xl sm:text-4xl md:text-5xl lg:text-6xl'
+      ? 'text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold'
       : fontSize === 'extralarge'
       ? 'text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold'
-      : 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'; // standard default
+      : 'text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold'; // standard
 
   return (
-    <section className={`relative min-h-[92vh] flex flex-col ${sectionAlignmentClass} px-4 sm:px-6 lg:px-8 overflow-hidden`}>
+    <section className={`relative min-h-[90vh] flex flex-col ${sectionPaddingClass} px-4 sm:px-6 lg:px-8 overflow-hidden`}>
       {/* Background Slideshow with Smooth Crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <AnimatePresence mode="sync">

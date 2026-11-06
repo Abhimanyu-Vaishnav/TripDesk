@@ -114,7 +114,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   heroTitle: '',
   heroSlides: DEFAULT_HERO_SLIDES,
   heroPosition: 'bottom',
-  heroFontSize: 'standard'
+  heroFontSize: 'standard',
+  planTripButtonText: 'Plan My Trip'
 };
 
 let memorySettings: SiteSettings = { ...DEFAULT_SETTINGS };
@@ -189,7 +190,8 @@ export async function fetchCloudSettings(): Promise<SiteSettings> {
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
           heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_HERO_SLIDES,
           heroPosition: data.hero_position || DEFAULT_SETTINGS.heroPosition,
-          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize
+          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize,
+          planTripButtonText: data.plan_trip_button_text || DEFAULT_SETTINGS.planTripButtonText
         };
         saveStoredSettings(cloudSettings);
         return cloudSettings;
@@ -250,6 +252,7 @@ export async function saveStoredSettings(settings: SiteSettings) {
         hero_slides: cleanedSettings.heroSlides,
         hero_position: cleanedSettings.heroPosition,
         hero_font_size: cleanedSettings.heroFontSize,
+        plan_trip_button_text: cleanedSettings.planTripButtonText,
         updated_at: new Date().toISOString()
       });
     } catch (dbErr) {

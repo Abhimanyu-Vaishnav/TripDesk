@@ -67,6 +67,7 @@ export interface SiteSettings {
   heroSlides?: { url: string; title: string }[];
   heroPosition?: 'bottom' | 'middle' | 'top'; // Vertical position of hero title & search box
   heroFontSize?: 'compact' | 'standard' | 'large' | 'extralarge'; // Tagline / Headline text size
+  planTripButtonText?: string; // Customizable CTA text in Navbar (e.g. "Plan My Trip")
 }
 
 export interface LeadInquiry {

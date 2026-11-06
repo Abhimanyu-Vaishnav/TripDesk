@@ -46,7 +46,8 @@ export async function GET() {
           heroTitle: data.hero_title || DEFAULT_SETTINGS.heroTitle,
           heroSlides: data.hero_slides && data.hero_slides.length > 0 ? data.hero_slides : DEFAULT_SETTINGS.heroSlides,
           heroPosition: data.hero_position || DEFAULT_SETTINGS.heroPosition,
-          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize
+          heroFontSize: data.hero_font_size || DEFAULT_SETTINGS.heroFontSize,
+          planTripButtonText: data.plan_trip_button_text || DEFAULT_SETTINGS.planTripButtonText
         };
       }
     } catch (err) {
@@ -99,6 +100,7 @@ export async function POST(request: Request) {
         hero_slides: cachedSettings.heroSlides,
         hero_position: cachedSettings.heroPosition,
         hero_font_size: cachedSettings.heroFontSize,
+        plan_trip_button_text: cachedSettings.planTripButtonText,
         updated_at: new Date().toISOString()
       });
 

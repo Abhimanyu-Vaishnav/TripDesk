@@ -7,7 +7,11 @@ import { Menu, X, Phone, Compass, MapPin, Sparkles, Moon, Sun } from 'lucide-rea
 import Logo from './Logo';
 import { useTheme } from '@/context/ThemeContext';
 
-export default function Navbar() {
+interface NavbarProps {
+  planTripButtonText?: string;
+}
+
+export default function Navbar({ planTripButtonText = 'Plan My Trip' }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -77,7 +81,7 @@ export default function Navbar() {
             href="/#contact"
             className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-[#351202] dark:bg-[#DB9309] dark:hover:bg-[#b87802] hover:bg-[#4D1D05] active:scale-95 transition-all shadow-sm hover:shadow"
           >
-            Plan My Trip
+            {planTripButtonText || 'Plan My Trip'}
           </Link>
         </div>
 
@@ -133,7 +137,7 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full text-center py-3 rounded-xl bg-[#DB9309] hover:bg-[#c48107] text-white font-semibold text-sm shadow-md"
                 >
-                  Inquire Now / Plan Trip
+                  {planTripButtonText || 'Plan My Trip'}
                 </Link>
               </div>
             </div>

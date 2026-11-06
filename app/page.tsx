@@ -211,7 +211,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FEFAEE] dark:bg-[#120904]">
-      <Navbar />
+      <Navbar planTripButtonText={settings?.planTripButtonText} />
 
       <main className="flex-1">
         {/* Hero Section */}
